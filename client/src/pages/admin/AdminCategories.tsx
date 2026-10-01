@@ -3,6 +3,7 @@ import { Plus, FolderTree, Trash2, Edit2, X } from 'lucide-react';
 import { fetchApi } from '../../api/client';
 import { Category } from '../../types';
 import { SEO } from '../../components/SEO';
+import { ImageUploader } from '../../components/ImageUploader';
 
 export const AdminCategories: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -172,15 +173,11 @@ export const AdminCategories: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-400 mb-1">Image URL</label>
-                <input
-                  type="url"
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
-                />
-              </div>
+              <ImageUploader
+                label="Category Banner / Thumbnail Image"
+                value={formData.imageUrl}
+                onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+              />
 
               <div className="flex justify-end space-x-3 pt-3 border-t border-slate-800">
                 <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-slate-800 rounded-xl font-bold">

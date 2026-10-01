@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import { ScrollToTop } from './components/ScrollToTop';
 import { CustomerLayout } from './layouts/CustomerLayout';
 import { AdminLayout } from './layouts/AdminLayout';
 
@@ -28,11 +29,16 @@ import { AdminProducts } from './pages/admin/AdminProducts';
 import { AdminCategories } from './pages/admin/AdminCategories';
 import { AdminInventory } from './pages/admin/AdminInventory';
 import { AdminOrders } from './pages/admin/AdminOrders';
+import { AdminCoupons } from './pages/admin/AdminCoupons';
+import { AdminBanners } from './pages/admin/AdminBanners';
+import { AdminPayments } from './pages/admin/AdminPayments';
+import { AdminCustomers } from './pages/admin/AdminCustomers';
 
 export const App: React.FC = () => {
   return (
     <AuthProvider>
       <CartProvider>
+        <ScrollToTop />
         <Routes>
           {/* Customer Storefront Routes */}
           <Route path="/" element={<CustomerLayout />}>
@@ -62,6 +68,10 @@ export const App: React.FC = () => {
             <Route path="categories" element={<AdminCategories />} />
             <Route path="inventory" element={<AdminInventory />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="coupons" element={<AdminCoupons />} />
+            <Route path="banners" element={<AdminBanners />} />
+            <Route path="payments" element={<AdminPayments />} />
+            <Route path="customers" element={<AdminCustomers />} />
           </Route>
         </Routes>
       </CartProvider>

@@ -39,14 +39,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     toggleWishlist(product);
   };
 
+  // Dynamic WhatsApp Message Template
   const productUrl = `${window.location.origin}/product/${product.slug}`;
-  const whatsappMessage = encodeURIComponent(
-    `Hello KING DAY, I would like to order:\n\n*${product.name}*\nSKU: ${product.sku}\nPrice: ₹${Number(product.salePrice).toLocaleString('en-IN')}\n\nLink: ${productUrl}`
-  );
-  const whatsappUrl = `https://wa.me/919495902904?text=${whatsappMessage}`;
+  const rawMsg = `Hello KING DAY 👋\n\nI'm interested in this product:\n\n🛍️ Product: ${product.name}\n💰 Price: ₹${Number(product.salePrice).toLocaleString('en-IN')}\n🔖 SKU: ${product.sku}\n\n🔗 Product: ${productUrl}\n\nPlease share more details and availability.\n\nThank you!`;
+  const whatsappUrl = `https://wa.me/919495902904?text=${encodeURIComponent(rawMsg)}`;
 
   return (
-    <div className="group relative bg-white rounded-2xl border border-slate-100 shadow-sm hover:shadow-premium transition-all duration-300 flex flex-col justify-between overflow-hidden">
+    <div className="group relative bg-white rounded-2xl border border-slate-100 shadow-2xs hover:shadow-premium transition-all duration-300 flex flex-col justify-between overflow-hidden">
       {/* Top Image Section */}
       <div className="relative aspect-square overflow-hidden bg-slate-50">
         <Link to={`/product/${product.slug}`} className="block w-full h-full">
@@ -60,7 +59,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 
         {/* Discount Badge */}
         {product.discount > 0 && (
-          <div className="absolute top-2.5 left-2.5 bg-brand-pink text-white font-bold text-xs px-2.5 py-1 rounded-full shadow-md tracking-wider">
+          <div className="absolute top-2 left-2 bg-brand-pink text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full shadow-sm tracking-wider">
             {Math.round(product.discount)}% OFF
           </div>
         )}
@@ -69,10 +68,10 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <button
           onClick={handleWishlistToggle}
           aria-label="Add to wishlist"
-          className="absolute top-2.5 right-2.5 w-10 h-10 rounded-full bg-white/90 backdrop-blur-md shadow-sm flex items-center justify-center text-slate-600 hover:text-brand-pink hover:bg-white transition-colors min-h-[44px] min-w-[44px]"
+          className="absolute top-2 right-2 w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 backdrop-blur-md shadow-2xs flex items-center justify-center text-slate-600 hover:text-brand-pink hover:bg-white transition-colors min-h-[44px] min-w-[44px]"
         >
           <Heart
-            className={`w-5 h-5 transition-colors ${
+            className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${
               isSaved ? 'fill-brand-pink text-brand-pink' : ''
             }`}
           />
@@ -81,7 +80,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         {/* Stock status overlay if out of stock */}
         {isOutOfStock && (
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
-            <span className="bg-red-600 text-white font-semibold text-xs px-3 py-1.5 rounded-full uppercase tracking-wider">
+            <span className="bg-red-600 text-white font-semibold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider">
               Out of Stock
             </span>
           </div>
@@ -89,68 +88,68 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       </div>
 
       {/* Product Details Section */}
-      <div className="p-3.5 md:p-5 flex-1 flex flex-col justify-between">
+      <div className="p-3 md:p-4 flex-1 flex flex-col justify-between space-y-2">
         <div>
-          <div className="flex items-center justify-between text-xs text-slate-400 font-medium mb-1">
-            <span className="uppercase tracking-wider">{product.brand || 'KING DAY'}</span>
-            <span className="truncate max-w-[100px]">{product.sku}</span>
+          <div className="flex items-center justify-between text-[10px] md:text-xs text-slate-400 font-medium mb-1">
+            <span className="uppercase tracking-wider font-bold">{product.brand || 'KING DAY'}</span>
+            <span className="truncate max-w-[90px]">{product.sku}</span>
           </div>
 
           <Link
             to={`/product/${product.slug}`}
-            className="font-semibold text-slate-800 hover:text-brand-blue line-clamp-2 text-sm md:text-base leading-snug mb-2 min-h-[40px]"
+            className="font-bold text-slate-800 hover:text-brand-blue line-clamp-2 text-xs md:text-sm leading-snug mb-1 min-h-[36px]"
           >
             {product.name}
           </Link>
         </div>
 
         {/* Pricing & Actions */}
-        <div className="mt-3 pt-3 border-t border-slate-100">
-          <div className="flex items-baseline space-x-2 mb-3">
-            <span className="text-lg md:text-xl font-extrabold text-slate-900">
+        <div className="pt-2 border-t border-slate-100 space-y-2">
+          <div className="flex items-baseline space-x-1.5">
+            <span className="text-base md:text-lg font-black text-slate-900">
               ₹{Number(product.salePrice).toLocaleString('en-IN')}
             </span>
             {product.mrp > product.salePrice && (
-              <span className="text-xs md:text-sm text-slate-400 line-through">
+              <span className="text-[10px] md:text-xs text-slate-400 line-through">
                 ₹{Number(product.mrp).toLocaleString('en-IN')}
               </span>
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={handleAddToCart}
-              disabled={isOutOfStock || adding}
-              className={`w-full py-2.5 px-3 rounded-xl font-semibold text-xs md:text-sm flex items-center justify-center space-x-1.5 transition-all min-h-[44px] ${
-                added
-                  ? 'bg-emerald-600 text-white'
-                  : isOutOfStock
-                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                  : 'bg-brand-blue text-white hover:bg-brand-purple active:scale-95 shadow-md shadow-brand-blue/10'
-              }`}
-            >
-              {added ? (
-                <>
-                  <Check className="w-4 h-4" />
-                  <span>Added</span>
-                </>
-              ) : (
-                <>
-                  <ShoppingBag className="w-4 h-4" />
-                  <span>Add</span>
-                </>
-              )}
-            </button>
-
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
             <a
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-2.5 px-2 rounded-xl font-semibold text-xs md:text-sm bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white border border-emerald-200 transition-all flex items-center justify-center space-x-1 min-h-[44px]"
+              className="w-full py-2 px-2 rounded-xl font-extrabold text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white transition-all flex items-center justify-center space-x-1 min-h-[44px] shadow-2xs"
             >
-              <MessageCircle className="w-4 h-4 fill-emerald-600 group-hover:fill-white" />
-              <span>WhatsApp</span>
+              <MessageCircle className="w-3.5 h-3.5 fill-current" />
+              <span>BUY ON WHATSAPP</span>
             </a>
+
+            <button
+              onClick={handleAddToCart}
+              disabled={isOutOfStock || adding}
+              className={`w-full py-2 px-2 rounded-xl font-bold text-[11px] flex items-center justify-center space-x-1 transition-all min-h-[44px] ${
+                added
+                  ? 'bg-emerald-100 text-emerald-800'
+                  : isOutOfStock
+                  ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
+                  : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
+              }`}
+            >
+              {added ? (
+                <>
+                  <Check className="w-3.5 h-3.5" />
+                  <span>Added</span>
+                </>
+              ) : (
+                <>
+                  <ShoppingBag className="w-3.5 h-3.5" />
+                  <span>Add Cart</span>
+                </>
+              )}
+            </button>
           </div>
         </div>
       </div>

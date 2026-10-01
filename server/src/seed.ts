@@ -37,7 +37,7 @@ export async function seedDatabase() {
       ]
     },
     {
-      name: 'Cycles & Tricycles',
+      name: 'Cycles & Trikes',
       slug: 'cycles-tricycles',
       description: 'Safe, durable, and ergonomic bicycles, tricycles, and balance bikes for growing toddlers and kids.',
       imageUrl: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=800&q=80',
@@ -49,11 +49,22 @@ export async function seedDatabase() {
       ]
     },
     {
+      name: 'Tractors & Farm Vehicles',
+      slug: 'tractors',
+      description: 'Heavy duty battery operated electric tractors with detachable trailers, front loaders, and Bluetooth sound.',
+      imageUrl: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=800&q=80',
+      sortOrder: 3,
+      children: [
+        { name: 'Electric Farm Tractors', slug: 'electric-farm-tractors', description: 'Battery tractors with trailers' },
+        { name: 'Front Loader Excavators', slug: 'front-loader-excavators', description: 'Working arm construction excavators' }
+      ]
+    },
+    {
       name: 'Toys & Games',
       slug: 'toys-games',
       description: 'Fun, educational, and engaging toys that spark creativity, joy, and active play.',
       imageUrl: 'https://images.unsplash.com/photo-1566576721346-d4a3b4eaeb55?auto=format&fit=crop&w=800&q=80',
-      sortOrder: 3,
+      sortOrder: 4,
       children: [
         { name: 'Educational & STEM Toys', slug: 'educational-stem-toys', description: 'Learning building blocks & puzzles' },
         { name: 'Remote Control Cars & Drones', slug: 'rc-cars-drones', description: 'High-speed RC vehicles' }
@@ -64,7 +75,7 @@ export async function seedDatabase() {
       slug: 'baby-essentials-gear',
       description: 'Certified safe baby strollers, high chairs, walkers, and nursery care items.',
       imageUrl: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=800&q=80',
-      sortOrder: 4,
+      sortOrder: 5,
       children: [
         { name: 'Baby Strollers & Prams', slug: 'strollers-prams', description: 'Lightweight foldable strollers' },
         { name: 'Baby Walkers & Rockers', slug: 'walkers-rockers', description: 'Musical baby walkers' }
@@ -107,12 +118,72 @@ export async function seedDatabase() {
   // Fetch created categories for reference
   const rideOnCategory = await prisma.category.findUnique({ where: { slug: '4x4-off-road-jeeps' } });
   const luxuryCarCategory = await prisma.category.findUnique({ where: { slug: 'luxury-ride-on-cars' } });
+  const tractorCategory = await prisma.category.findUnique({ where: { slug: 'electric-farm-tractors' } });
   const cycleCategory = await prisma.category.findUnique({ where: { slug: 'kids-bicycles' } });
   const trikeCategory = await prisma.category.findUnique({ where: { slug: 'toddler-tricycles' } });
   const strollerCategory = await prisma.category.findUnique({ where: { slug: 'strollers-prams' } });
 
   // Sample Products
   const products = [
+    {
+      name: 'Hulk WN 1166 Kids Electric Ride-On Jeep',
+      slug: 'hulk-wn-1166-kids-electric-ride-on-jeep',
+      sku: 'WN1166',
+      brand: 'KING DAY',
+      categoryId: rideOnCategory?.id || '',
+      description: 'Heavy duty 4x4 monster ride-on jeep with dual 12V motors, 2.4G parental remote control, shock absorber suspension, working LED lights, and Bluetooth music audio.',
+      shortDescription: 'Monster 4WD Electric Jeep with Parental Remote Control & Bluetooth Audio.',
+      mrp: 14999.00,
+      salePrice: 9499.00,
+      discount: 36.7,
+      featured: true,
+      stock: 15,
+      images: [
+        'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=1000&q=80',
+        'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80'
+      ],
+      features: [
+        '2.4G Parental Remote Control with emergency brake',
+        'Dual 12V Heavy-Duty Rechargeable Battery',
+        'Bluetooth, USB & AUX Music Player with built-in speakers',
+        'Shock absorbing 4-wheel independent suspension',
+        'Bright LED Headlights, Taillights and Fog lights'
+      ],
+      specs: [
+        { name: 'Age Group', value: '2 - 8 Years' },
+        { name: 'Weight Capacity', value: '50 kg' },
+        { name: 'Speed', value: '3 - 7 km/h' },
+        { name: 'Battery', value: '12V 7Ah Dual Battery' }
+      ]
+    },
+    {
+      name: 'KING DAY PowerTrak 12V Electric Farm Tractor with Detachable Trailer',
+      slug: 'king-day-powertrak-12v-electric-farm-tractor',
+      sku: 'KD-TRAC-12V-01',
+      brand: 'KING DAY',
+      categoryId: tractorCategory?.id || '',
+      description: 'Authentic 12V battery-operated electric tractor with large detachable tipping trailer, 2-speed gear shift, Bluetooth music player, horns, and dual high-torque rear motors.',
+      shortDescription: '12V Electric Farm Tractor with detachable trailer & Bluetooth sound player.',
+      mrp: 18999.00,
+      salePrice: 13999.00,
+      discount: 26.3,
+      featured: true,
+      stock: 10,
+      images: [
+        'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1000&q=80'
+      ],
+      features: [
+        'Large capacity detachable tipping trailer for hauling toys & sand',
+        'Dual 12V motors with high traction knobby tires',
+        'Bluetooth FM radio & horn sounds',
+        'High/Low speed switch & reverse gear'
+      ],
+      specs: [
+        { name: 'Age Group', value: '3 - 7 Years' },
+        { name: 'Weight Limit', value: '45 kg' },
+        { name: 'Battery', value: '12V 7Ah' }
+      ]
+    },
     {
       name: 'KING DAY Commander 4x4 Monster Off-Road Electric Jeep',
       slug: 'king-day-commander-4x4-monster-jeep',
@@ -127,22 +198,16 @@ export async function seedDatabase() {
       featured: true,
       stock: 12,
       images: [
-        'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=1000&q=80',
-        'https://images.unsplash.com/photo-1544816155-12df9643f363?auto=format&fit=crop&w=1000&q=80'
+        'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=1000&q=80'
       ],
       features: [
         '2.4G Parental Remote Control with emergency stop button',
         'Dual 12V Heavy-Duty Rechargeable Battery',
-        'Bluetooth, USB & AUX Music Player with built-in speakers',
-        'Shock absorbing 4-wheel independent suspension',
-        'Bright LED Headlights, Taillights and Fog lights'
+        'Bluetooth, USB & AUX Music Player with built-in speakers'
       ],
       specs: [
         { name: 'Age Group', value: '2 - 8 Years' },
-        { name: 'Weight Capacity', value: '50 kg' },
-        { name: 'Speed', value: '3 - 7 km/h' },
-        { name: 'Battery', value: '12V 7Ah Dual Battery' },
-        { name: 'Charging Time', value: '6 - 8 Hours' }
+        { name: 'Weight Capacity', value: '50 kg' }
       ]
     },
     {
@@ -163,13 +228,10 @@ export async function seedDatabase() {
       ],
       features: [
         'Hydraulic Scissor Doors that open upwards',
-        'Soft-start acceleration system to protect gentle necks',
-        'Digital battery level indicator screen'
+        'Soft-start acceleration system to protect gentle necks'
       ],
       specs: [
-        { name: 'Age Group', value: '2 - 6 Years' },
-        { name: 'Max Weight', value: '35 kg' },
-        { name: 'Battery', value: '12V 4.5Ah' }
+        { name: 'Age Group', value: '2 - 6 Years' }
       ]
     },
     {
@@ -190,66 +252,10 @@ export async function seedDatabase() {
       ],
       features: [
         'Adjustable seat height with quick-release clamp',
-        'Pneumatic rubber anti-skid tires',
-        'Sturdy steel frame with rust-resistant powder coating'
+        'Pneumatic rubber anti-skid tires'
       ],
       specs: [
-        { name: 'Wheel Size', value: '16 Inch' },
-        { name: 'Age Group', value: '4 - 7 Years' },
-        { name: 'Frame Material', value: 'High Carbon Steel' }
-      ]
-    },
-    {
-      name: 'KING DAY Royal Smart Convertible Tricycle with Canopy',
-      slug: 'king-day-royal-smart-convertible-tricycle',
-      sku: 'KD-TRIKE-ROYAL-01',
-      brand: 'KING DAY',
-      categoryId: trikeCategory?.id || '',
-      description: '4-in-1 convertible toddler tricycle with UV protection canopy, 360-degree rotating seat, parent steering handlebar, and rear storage basket.',
-      shortDescription: '4-in-1 parent steerable tricycle with 360 seat & sun shade.',
-      mrp: 7499.00,
-      salePrice: 5299.00,
-      discount: 29.3,
-      featured: false,
-      stock: 15,
-      images: [
-        'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?auto=format&fit=crop&w=1000&q=80'
-      ],
-      features: [
-        'Reversible 360 degree seat position',
-        'Foldable sun protection canopy',
-        'Adjustable push handle for parent control'
-      ],
-      specs: [
-        { name: 'Age Group', value: '1 - 4 Years' },
-        { name: 'Weight Limit', value: '25 kg' }
-      ]
-    },
-    {
-      name: 'KING DAY AirGlide Ultra-Light Foldable Baby Stroller',
-      slug: 'king-day-airglide-foldable-baby-stroller',
-      sku: 'KD-STROLLER-AIRGLIDE',
-      brand: 'KING DAY',
-      categoryId: strollerCategory?.id || '',
-      description: 'Ultra-lightweight cabin-approved airplane stroller with 1-second compact auto-folding system, multi-position reclining seat, and 5-point safety harness.',
-      shortDescription: 'Compact travel stroller with 1-second auto fold & full lie-flat recline.',
-      mrp: 12999.00,
-      salePrice: 8999.00,
-      discount: 30.7,
-      featured: true,
-      stock: 10,
-      images: [
-        'https://images.unsplash.com/photo-1591084726196-8e7f25f728d7?auto=format&fit=crop&w=1000&q=80'
-      ],
-      features: [
-        'Fits in cabin overhead luggage bins on airplanes',
-        'Multi-position stepless backrest recline (up to 175°)',
-        '360° front swivel wheels with suspension lock'
-      ],
-      specs: [
-        { name: 'Age Group', value: '0 - 36 Months' },
-        { name: 'Stroller Weight', value: '5.8 kg' },
-        { name: 'Safety Harness', value: '5-Point Safety Belt' }
+        { name: 'Wheel Size', value: '16 Inch' }
       ]
     }
   ];
@@ -325,17 +331,17 @@ export async function seedDatabase() {
       data: [
         {
           title: 'Electric Ride-On Super Sale',
-          subtitle: 'Up to 30% OFF on 4x4 Jeeps & Supercars with Free Home Delivery across India!',
+          subtitle: 'Up to 30% OFF on 4x4 Jeeps, Tractors & Supercars with Free Home Delivery across India!',
           imageUrl: 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=1600&q=80',
           link: '/category/electric-ride-ons',
           active: true,
           sortOrder: 1
         },
         {
-          title: 'Premium Ergonomic Kids Bicycles',
-          subtitle: 'Engineered for maximum safety, balance, and outdoor joy.',
-          imageUrl: 'https://images.unsplash.com/photo-1485965120184-e220f721d03e?auto=format&fit=crop&w=1600&q=80',
-          link: '/category/cycles-tricycles',
+          title: 'Heavy-Duty Electric Tractors',
+          subtitle: 'Equipped with detachable trailers, front loaders, and 12V high traction motors.',
+          imageUrl: 'https://images.unsplash.com/photo-1500937386664-56d1dfef3854?auto=format&fit=crop&w=1600&q=80',
+          link: '/category/tractors',
           active: true,
           sortOrder: 2
         }

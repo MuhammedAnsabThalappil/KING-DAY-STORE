@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Plus, Search, Edit2, Trash2, Check, X, Image as ImageIcon } from 'lucide-react';
 import { fetchApi } from '../../api/client';
 import { Product, Category } from '../../types';
+import { ImageUploader } from '../../components/ImageUploader';
 import { SEO } from '../../components/SEO';
 
 export const AdminProducts: React.FC = () => {
@@ -9,8 +10,10 @@ export const AdminProducts: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [feedbackMsg, setFeedbackMsg] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   // Form State
   const [formData, setFormData] = useState({
@@ -25,7 +28,7 @@ export const AdminProducts: React.FC = () => {
     stock: 10,
     lowStockThreshold: 3,
     featured: false,
-    imageUrl: '',
+    imageUrl: 'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=800&q=80',
     features: ['2.4G Parental Remote Control', 'Bluetooth Music Player', 'Dual Rechargeable Batteries']
   });
 
@@ -53,6 +56,9 @@ export const AdminProducts: React.FC = () => {
 
   const handleCreateOrUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitting(true);
+    setFeedbackMsg(null);
+
     const payload = {
       ...formData,
       mrp: Number(formData.mrp),
@@ -67,31 +73,44 @@ export const AdminProducts: React.FC = () => {
         method: 'PUT',
         body: JSON.stringify(payload)
       });
+      setSubmitting(false);
       if (res.success) {
-        setIsModalOpen(false);
-        setEditingId(null);
-        loadData();
+        setFeedbackMsg({ type: 'success', text: 'Product updated successfully in PostgreSQL database!' });
+        setTimeout(() => {
+          setIsModalOpen(false);
+          setEditingId(null);
+          loadData();
+        }, 1000);
+      } else {
+        setFeedbackMsg({ type: 'error', text: res.error?.message || 'Failed to update product' });
       }
     } else {
       const res = await fetchApi('/products', {
         method: 'POST',
         body: JSON.stringify(payload)
       });
+      setSubmitting(false);
       if (res.success) {
-        setIsModalOpen(false);
-        loadData();
+        setFeedbackMsg({ type: 'success', text: 'New Product created successfully in PostgreSQL database!' });
+        setTimeout(() => {
+          setIsModalOpen(false);
+          loadData();
+        }, 1000);
+      } else {
+        setFeedbackMsg({ type: 'error', text: res.error?.message || 'Failed to create product' });
       }
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this product?')) return;
+    if (!window.confirm('Are you sure you want to delete or deactivate this product?')) return;
     const res = await fetchApi(`/products/${id}`, { method: 'DELETE' });
     if (res.success) loadData();
   };
 
   const openCreateModal = () => {
     setEditingId(null);
+    setFeedbackMsg(null);
     setFormData({
       name: '',
       sku: `KD-SKU-${Math.floor(1000 + Math.random() * 9000)}`,
@@ -112,6 +131,7 @@ export const AdminProducts: React.FC = () => {
 
   const openEditModal = (product: Product) => {
     setEditingId(product.id);
+    setFeedbackMsg(null);
     setFormData({
       name: product.name,
       sku: product.sku,
@@ -233,6 +253,12 @@ export const AdminProducts: React.FC = () => {
               </button>
             </div>
 
+            {feedbackMsg && (
+              <div className={`p-3 rounded-xl text-xs font-bold ${feedbackMsg.type === 'success' ? 'bg-emerald-500/20 text-emerald-300' : 'bg-red-500/20 text-red-300'}`}>
+                {feedbackMsg.text}
+              </div>
+            )}
+
             <form onSubmit={handleCreateOrUpdate} className="space-y-4 text-xs">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <div>
@@ -303,16 +329,12 @@ export const AdminProducts: React.FC = () => {
                 </select>
               </div>
 
-              <div>
-                <label className="block font-bold text-slate-400 mb-1">Image URL *</label>
-                <input
-                  type="url"
-                  required
-                  value={formData.imageUrl}
-                  onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
-                />
-              </div>
+              {/* Upload Image Component */}
+              <ImageUploader
+                label="Product Primary Image *"
+                value={formData.imageUrl}
+                onChange={(url) => setFormData({ ...formData, imageUrl: url })}
+              />
 
               <div>
                 <label className="block font-bold text-slate-400 mb-1">Full Description *</label>
@@ -340,15 +362,16 @@ export const AdminProducts: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold hover:bg-slate-700"
+                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-xl bg-brand-purple text-white font-bold hover:bg-brand-pink transition-all"
+                  disabled={submitting}
+                  className="px-6 py-2 rounded-xl bg-brand-purple text-white font-bold hover:bg-brand-pink transition-all disabled:opacity-50"
                 >
-                  {editingId ? 'Save Changes' : 'Create Product'}
+                  {submitting ? 'Saving...' : editingId ? 'Save Changes' : 'Create Product'}
                 </button>
               </div>
             </form>

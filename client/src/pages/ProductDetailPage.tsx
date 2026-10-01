@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   RotateCcw,
   Check,
-  Star,
   Zap,
   ChevronRight
 } from 'lucide-react';
@@ -104,14 +103,13 @@ export const ProductDetailPage: React.FC = () => {
     }
   };
 
-  const productUrl = `${window.location.origin}/product/${product.slug}`;
-  const whatsappMessage = encodeURIComponent(
-    `Hello KING DAY, I would like to purchase:\n\n*${product.name}*\nSKU: ${product.sku}\nPrice: ₹${Number(product.salePrice).toLocaleString('en-IN')}\nURL: ${productUrl}`
-  );
-  const whatsappUrl = `https://wa.me/919495902904?text=${whatsappMessage}`;
+  // Dynamic WhatsApp Message Template per Specification #17
+  const currentUrl = `${window.location.origin}/product/${product.slug}`;
+  const rawWhatsappMsg = `Hello KING DAY 👋\n\nI'm interested in this product:\n\n🛍️ Product: ${product.name}\n💰 Price: ₹${Number(product.salePrice).toLocaleString('en-IN')}\n🔖 SKU: ${product.sku}\n\n🔗 Product: ${currentUrl}\n\nPlease share more details and availability.\n\nThank you!`;
+  const whatsappUrl = `https://wa.me/919495902904?text=${encodeURIComponent(rawWhatsappMsg)}`;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 space-y-12">
+    <div className="max-w-7xl mx-auto px-4 py-6 md:py-10 space-y-10 pb-28 md:pb-12">
       <SEO
         title={`${product.name} — Buy Online`}
         description={product.shortDescription || product.description.slice(0, 160)}
@@ -245,44 +243,44 @@ export const ProductDetailPage: React.FC = () => {
             )}
           </div>
 
-          {/* Action Buttons */}
+          {/* Primary Action: BUY THROUGH WHATSAPP */}
           <div className="space-y-3 pt-4 border-t border-slate-100">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <a
+              href={whatsappUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full py-4 px-6 rounded-2xl font-extrabold text-sm md:text-base bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center space-x-2.5 min-h-[52px]"
+            >
+              <MessageCircle className="w-6 h-6 fill-current" />
+              <span>BUY THROUGH WHATSAPP</span>
+            </a>
+
+            {/* Secondary Actions: Add to Cart & Buy Now */}
+            <div className="grid grid-cols-2 gap-3">
               <button
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className={`w-full py-4 px-6 rounded-2xl font-extrabold text-sm flex items-center justify-center space-x-2 transition-all min-h-[48px] ${
+                className={`w-full py-3 px-4 rounded-xl font-bold text-xs md:text-sm flex items-center justify-center space-x-1.5 transition-all min-h-[44px] ${
                   added
-                    ? 'bg-emerald-600 text-white'
+                    ? 'bg-emerald-100 text-emerald-800'
                     : isOutOfStock
                     ? 'bg-slate-100 text-slate-400 cursor-not-allowed'
-                    : 'bg-brand-blue text-white hover:bg-brand-purple shadow-brand-glow active:scale-95'
+                    : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
                 }`}
               >
-                {added ? <Check className="w-5 h-5" /> : <ShoppingBag className="w-5 h-5" />}
-                <span>{added ? 'Added to Cart' : 'Add to Cart'}</span>
+                {added ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+                <span>{added ? 'Added to Cart' : 'ADD TO CART'}</span>
               </button>
 
               <button
                 onClick={handleBuyNow}
                 disabled={isOutOfStock}
-                className="w-full py-4 px-6 rounded-2xl font-extrabold text-sm bg-gradient-to-r from-brand-purple to-brand-pink text-white hover:shadow-pink-glow transition-all active:scale-95 flex items-center justify-center space-x-2 min-h-[48px]"
+                className="w-full py-3 px-4 rounded-xl font-bold text-xs md:text-sm bg-brand-purple hover:bg-brand-blue text-white transition-all min-h-[44px] flex items-center justify-center space-x-1"
               >
-                <Zap className="w-5 h-5 fill-current" />
-                <span>Buy Now</span>
+                <Zap className="w-4 h-4 fill-current" />
+                <span>BUY NOW</span>
               </button>
             </div>
-
-            {/* WhatsApp Direct Order Button */}
-            <a
-              href={whatsappUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="w-full py-3.5 px-6 rounded-2xl font-bold text-sm bg-emerald-500 hover:bg-emerald-600 text-white transition-all shadow-md flex items-center justify-center space-x-2 min-h-[48px]"
-            >
-              <MessageCircle className="w-5 h-5 fill-current" />
-              <span>Order Instantly on WhatsApp (+91 9495902904)</span>
-            </a>
           </div>
 
           {/* Delivery & Warranty Guarantees */}
@@ -362,6 +360,26 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Mobile Sticky Bottom Purchase Bar */}
+      <div
+        className="md:hidden fixed bottom-16 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 shadow-2xl flex items-center justify-between space-x-3"
+        style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
+      >
+        <div className="truncate">
+          <span className="block text-[10px] text-slate-400 font-bold uppercase truncate">{product.name}</span>
+          <span className="text-base font-extrabold text-slate-900">₹{Number(product.salePrice).toLocaleString('en-IN')}</span>
+        </div>
+        <a
+          href={whatsappUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs flex items-center space-x-1.5 shrink-0 shadow-md min-h-[44px]"
+        >
+          <MessageCircle className="w-4 h-4 fill-current" />
+          <span>BUY ON WHATSAPP</span>
+        </a>
+      </div>
     </div>
   );
 };
