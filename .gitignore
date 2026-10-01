@@ -1,0 +1,28 @@
+# Node.js dependencies
+node_modules/
+client/node_modules/
+server/node_modules/
+
+# Environment & credentials
+.env
+.env.local
+.env.development
+.env.production
+server/.env
+
+# Build outputs
+dist/
+client/dist/
+server/dist/
+
+# Uploaded assets & temporary files
+uploads/
+server/uploads/
+scratch/
+*.log
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

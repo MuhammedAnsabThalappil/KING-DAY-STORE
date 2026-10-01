@@ -1,0 +1,25 @@
+{
+  "name": "king-day-store",
+  "version": "1.0.0",
+  "description": "KING DAY STORE — Production-Grade E-Commerce Platform",
+  "private": true,
+  "scripts": {
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:server": "cd server && npm run build",
+    "build:client": "cd client && npm run build",
+    "build": "npm run build:server && npm run build:client",
+    "db:generate": "npx prisma generate",
+    "db:migrate": "npx prisma migrate dev",
+    "db:deploy": "npx prisma migrate deploy",
+    "db:seed": "cd server && npm run seed"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "prisma": "^5.19.0"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.19.0"
+  }
+}
