@@ -7,6 +7,7 @@ import apiRouter from './routes/api.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { rateLimiter } from './middleware/rateLimiter.js';
 import { env } from './config/env.js';
+import { sendError } from './utils/response.js';
 
 const app = express();
 
@@ -51,6 +52,11 @@ app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
 
 // API Routes
 app.use('/api', apiRouter);
+
+// Fallback JSON 404 handler for unmatched API endpoints
+app.use('/api/*', (req, res) => {
+  return sendError(res, `API route not found: ${req.method} ${req.originalUrl}`, 'NOT_FOUND', 404);
+});
 
 // Global Error Handler
 app.use(errorHandler);

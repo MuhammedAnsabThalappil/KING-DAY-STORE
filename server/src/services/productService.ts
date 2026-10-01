@@ -216,6 +216,9 @@ export class ProductService {
       }
 
       return product;
+    }, {
+      maxWait: 10000,
+      timeout: 20000
     });
   }
 
@@ -303,6 +306,9 @@ export class ProductService {
       }
 
       return updated;
+    }, {
+      maxWait: 10000,
+      timeout: 20000
     });
   }
 

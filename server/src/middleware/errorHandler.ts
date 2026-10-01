@@ -35,7 +35,7 @@ export function errorHandler(
       res,
       'Requested database record was not found',
       'NOT_FOUND',
-      44
+      404
     );
   }
 
