@@ -169,11 +169,21 @@ export class OrderService {
           notes,
           items: {
             create: orderItemDatas
+          },
+          payments: {
+            create: {
+              provider: paymentMethod === PaymentMethod.RAZORPAY ? 'RAZORPAY' : 'COD',
+              amount: totalAmount,
+              currency: 'INR',
+              method: paymentMethod,
+              status: PaymentStatus.PENDING
+            }
           }
         },
         include: {
           items: true,
-          customer: true
+          customer: true,
+          payments: true
         }
       });
 
@@ -194,19 +204,10 @@ export class OrderService {
         });
       }
 
-      // Create initial Payment entry
-      await tx.payment.create({
-        data: {
-          orderId: order.id,
-          provider: paymentMethod === PaymentMethod.RAZORPAY ? 'RAZORPAY' : 'COD',
-          amount: totalAmount,
-          currency: 'INR',
-          method: paymentMethod,
-          status: PaymentStatus.PENDING
-        }
-      });
-
       return order;
+    }, {
+      maxWait: 10000,
+      timeout: 20000
     });
   }
 

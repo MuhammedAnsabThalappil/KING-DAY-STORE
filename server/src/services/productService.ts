@@ -146,79 +146,68 @@ export class ProductService {
   static async createProduct(data: any) {
     const slug = data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
 
-    return await prisma.$transaction(async (tx: any) => {
-      const product = await tx.product.create({
-        data: {
-          name: data.name,
-          slug,
-          sku: data.sku,
-          brand: data.brand || 'KING DAY',
-          categoryId: data.categoryId,
-          description: data.description,
-          shortDescription: data.shortDescription,
-          mrp: data.mrp,
-          salePrice: data.salePrice,
-          discount: data.discount || Math.round(((data.mrp - data.salePrice) / data.mrp) * 100),
-          featured: data.featured || false,
-          active: data.active !== undefined ? data.active : true,
-          seoTitle: data.seoTitle || data.name,
-          seoDescription: data.seoDescription || data.shortDescription,
-          images: data.images ? {
-            create: data.images.map((img: any, idx: number) => ({
-              imageUrl: img.imageUrl,
-              altText: img.altText || data.name,
-              isPrimary: img.isPrimary ?? idx === 0,
-              sortOrder: img.sortOrder ?? idx
-            }))
-          } : undefined,
-          specifications: data.specifications ? {
-            create: data.specifications.map((spec: any, idx: number) => ({
-              name: spec.name,
-              value: spec.value,
-              sortOrder: spec.sortOrder ?? idx
-            }))
-          } : undefined,
-          features: data.features ? {
-            create: data.features.map((feat: string, idx: number) => ({
-              feature: feat,
-              sortOrder: idx
-            }))
-          } : undefined,
-          inventory: {
-            create: {
-              quantity: data.stock || 0,
-              reservedQuantity: 0,
-              availableQuantity: data.stock || 0,
-              lowStockThreshold: data.lowStockThreshold || 5
-            }
+    return await prisma.product.create({
+      data: {
+        name: data.name,
+        slug,
+        sku: data.sku,
+        brand: data.brand || 'KING DAY',
+        categoryId: data.categoryId,
+        description: data.description,
+        shortDescription: data.shortDescription,
+        mrp: data.mrp,
+        salePrice: data.salePrice,
+        discount: data.discount || Math.round(((data.mrp - data.salePrice) / data.mrp) * 100),
+        featured: data.featured || false,
+        active: data.active !== undefined ? data.active : true,
+        seoTitle: data.seoTitle || data.name,
+        seoDescription: data.seoDescription || data.shortDescription,
+        images: data.images ? {
+          create: data.images.map((img: any, idx: number) => ({
+            imageUrl: img.imageUrl,
+            altText: img.altText || data.name,
+            isPrimary: img.isPrimary ?? idx === 0,
+            sortOrder: img.sortOrder ?? idx
+          }))
+        } : undefined,
+        specifications: data.specifications ? {
+          create: data.specifications.map((spec: any, idx: number) => ({
+            name: spec.name,
+            value: spec.value,
+            sortOrder: spec.sortOrder ?? idx
+          }))
+        } : undefined,
+        features: data.features ? {
+          create: data.features.map((feat: string, idx: number) => ({
+            feature: feat,
+            sortOrder: idx
+          }))
+        } : undefined,
+        inventory: {
+          create: {
+            quantity: data.stock || 0,
+            reservedQuantity: 0,
+            availableQuantity: data.stock || 0,
+            lowStockThreshold: data.lowStockThreshold || 5
           }
         },
-        include: {
-          category: true,
-          images: true,
-          inventory: true,
-          specifications: true,
-          features: true
-        }
-      });
-
-      if (data.stock && data.stock > 0) {
-        await tx.inventoryTransaction.create({
-          data: {
-            productId: product.id,
+        transactions: data.stock && data.stock > 0 ? {
+          create: {
             type: TransactionType.PURCHASE,
             quantity: data.stock,
             previousQuantity: 0,
             newQuantity: data.stock,
             note: 'Initial product creation stock entry'
           }
-        });
+        } : undefined
+      },
+      include: {
+        category: true,
+        images: true,
+        inventory: true,
+        specifications: true,
+        features: true
       }
-
-      return product;
-    }, {
-      maxWait: 10000,
-      timeout: 20000
     });
   }
 
