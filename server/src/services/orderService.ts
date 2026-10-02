@@ -172,7 +172,7 @@ export class OrderService {
           },
           payments: {
             create: {
-              provider: paymentMethod === PaymentMethod.RAZORPAY ? 'RAZORPAY' : 'COD',
+              provider: paymentMethod === PaymentMethod.RAZORPAY ? 'RAZORPAY' : paymentMethod === PaymentMethod.WHATSAPP ? 'WHATSAPP' : 'COD',
               amount: totalAmount,
               currency: 'INR',
               method: paymentMethod,

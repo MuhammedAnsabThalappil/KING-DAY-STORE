@@ -105,7 +105,7 @@ export const ProductDetailPage: React.FC = () => {
 
   // Dynamic WhatsApp Message Template per Specification #17
   const currentUrl = `${window.location.origin}/product/${product.slug}`;
-  const rawWhatsappMsg = `Hello KING DAY 👋\n\nI'm interested in this product:\n\n🛍️ Product: ${product.name}\n💰 Price: ₹${Number(product.salePrice).toLocaleString('en-IN')}\n🔖 SKU: ${product.sku}\n\n🔗 Product: ${currentUrl}\n\nPlease share more details and availability.\n\nThank you!`;
+  const rawWhatsappMsg = `Hello KING DAY 👋\n\nI'm interested in this product:\n\n🛍️ Product: ${product.name}\n💰 Price: ₹${Number(product.salePrice).toLocaleString('en-IN')}\n🔖 SKU: ${product.sku}\n\n🔗 Product: ${currentUrl}\n\nPlease share more details, availability and delivery information.\n\nThank you!`;
   const whatsappUrl = `https://wa.me/919495902904?text=${encodeURIComponent(rawWhatsappMsg)}`;
 
   return (

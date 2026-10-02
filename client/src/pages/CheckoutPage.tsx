@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Lock, CreditCard, Banknote, ArrowRight, Check } from 'lucide-react';
+import { ShieldCheck, Lock, CreditCard, Banknote, ArrowRight, Check, MessageCircle } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { fetchApi } from '../api/client';
 import { Order } from '../types';
@@ -27,7 +27,7 @@ export const CheckoutPage: React.FC = () => {
     state: 'Kerala',
     pincode: '',
     landmark: '',
-    paymentMethod: 'COD' as 'RAZORPAY' | 'COD',
+    paymentMethod: 'WHATSAPP' as any,
     notes: ''
   });
 
@@ -60,7 +60,7 @@ export const CheckoutPage: React.FC = () => {
     setLoading(true);
 
     try {
-      // 1. Create Order in backend
+      // 1. Create Order in backend with WHATSAPP payment method
       const orderPayload = {
         customerName: formData.name,
         customerEmail: formData.email,
@@ -76,7 +76,7 @@ export const CheckoutPage: React.FC = () => {
           pincode: formData.pincode,
           landmark: formData.landmark
         },
-        paymentMethod: formData.paymentMethod,
+        paymentMethod: 'WHATSAPP',
         notes: formData.notes,
         items: cart.items.map((i) => ({
           productId: i.product.id,
@@ -95,88 +95,14 @@ export const CheckoutPage: React.FC = () => {
 
       const order = orderRes.data;
 
-      // 2. If COD selected, finish immediately
-      if (formData.paymentMethod === 'COD') {
-        await clearCart();
-        navigate(`/order-success?orderNumber=${order.orderNumber}`);
-        return;
-      }
+      // 2. Format WhatsApp Order Message & Open WhatsApp window
+      const itemsList = cart.items.map((i, idx) => `${idx + 1}. ${i.product.name}\n   SKU: ${i.product.sku}\n   Qty: ${i.quantity}\n   Price: ₹${Number(i.itemTotal).toLocaleString('en-IN')}`).join('\n\n');
+      const rawMsg = `Hello KING DAY 👋\n\nI have placed an order on the website:\n\n📋 Order #${order.orderNumber}\n👤 Name: ${formData.name}\n📞 Phone: ${formData.phone}\n📍 Address: ${formData.addressLine1}, ${formData.city}, ${formData.state} - ${formData.pincode}\n\n🛍️ Items:\n${itemsList}\n\n💰 Total Amount: ₹${totalAmount.toLocaleString('en-IN')}\n\nPlease confirm availability and delivery details.\n\nThank you!`;
+      const waUrl = `https://wa.me/919495902904?text=${encodeURIComponent(rawMsg)}`;
 
-      // 3. If RAZORPAY selected, invoke Razorpay Order API & Modal
-      const payRes = await fetchApi<any>('/payments/create-order', {
-        method: 'POST',
-        body: JSON.stringify({ orderId: order.id })
-      });
-
-      if (!payRes.success || !payRes.data) {
-        throw new Error(payRes.error?.message || 'Failed to initialize payment gateway');
-      }
-
-      const payData = payRes.data;
-
-      if (payData.isTestMode || !window.Razorpay) {
-        // Direct test verification for development setup without live Razorpay SDK keys
-        const verifyRes = await fetchApi<Order>('/payments/verify', {
-          method: 'POST',
-          body: JSON.stringify({
-            orderId: order.id,
-            razorpayOrderId: payData.razorpayOrderId,
-            razorpayPaymentId: `pay_mock_${Date.now()}`,
-            razorpaySignature: 'test_mode_signature'
-          })
-        });
-
-        if (verifyRes.success) {
-          await clearCart();
-          navigate(`/order-success?orderNumber=${order.orderNumber}`);
-          return;
-        }
-      }
-
-      // Live Razorpay Popup Options
-      const options = {
-        key: payData.key,
-        amount: payData.amount,
-        currency: payData.currency,
-        name: 'KING DAY STORE',
-        description: `Order #${order.orderNumber}`,
-        order_id: payData.razorpayOrderId,
-        prefill: {
-          name: formData.name,
-          email: formData.email,
-          contact: formData.phone
-        },
-        theme: {
-          color: '#5B2BE0'
-        },
-        handler: async function (response: any) {
-          const verifyRes = await fetchApi<Order>('/payments/verify', {
-            method: 'POST',
-            body: JSON.stringify({
-              orderId: order.id,
-              razorpayOrderId: response.razorpay_order_id,
-              razorpayPaymentId: response.razorpay_payment_id,
-              razorpaySignature: response.razorpay_signature
-            })
-          });
-
-          if (verifyRes.success) {
-            await clearCart();
-            navigate(`/order-success?orderNumber=${order.orderNumber}`);
-          } else {
-            setErrorMsg('Payment verification failed. Please contact support.');
-            setLoading(false);
-          }
-        },
-        modal: {
-          ondismiss: function () {
-            setLoading(false);
-          }
-        }
-      };
-
-      const rzp = new window.Razorpay(options);
-      rzp.open();
+      window.open(waUrl, '_blank');
+      await clearCart();
+      navigate(`/order-success?orderNumber=${order.orderNumber}`);
     } catch (err: any) {
       setErrorMsg(err.message || 'Checkout failed. Please try again.');
       setLoading(false);
@@ -320,56 +246,16 @@ export const CheckoutPage: React.FC = () => {
           {/* Payment Method */}
           <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
             <h3 className="font-extrabold text-sm uppercase text-slate-800 tracking-wider">
-              3. Select Payment Method
+              3. Payment & Delivery Confirmation
             </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <label
-                className={`p-4 rounded-2xl border-2 cursor-pointer flex items-center space-x-3 transition-all ${
-                  formData.paymentMethod === 'RAZORPAY'
-                    ? 'border-brand-purple bg-brand-purple/5 shadow-sm'
-                    : 'border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="RAZORPAY"
-                  checked={formData.paymentMethod === 'RAZORPAY'}
-                  onChange={handleInputChange}
-                  className="text-brand-purple focus:ring-brand-purple"
-                />
-                <div>
-                  <div className="flex items-center space-x-1 font-bold text-sm text-slate-900">
-                    <CreditCard className="w-4 h-4 text-brand-purple" />
-                    <span>Razorpay Online</span>
-                  </div>
-                  <span className="text-[11px] text-slate-500">UPI, Cards, NetBanking</span>
-                </div>
-              </label>
-
-              <label
-                className={`p-4 rounded-2xl border-2 cursor-pointer flex items-center space-x-3 transition-all ${
-                  formData.paymentMethod === 'COD'
-                    ? 'border-brand-purple bg-brand-purple/5 shadow-sm'
-                    : 'border-slate-200 hover:border-slate-300'
-                }`}
-              >
-                <input
-                  type="radio"
-                  name="paymentMethod"
-                  value="COD"
-                  checked={formData.paymentMethod === 'COD'}
-                  onChange={handleInputChange}
-                  className="text-brand-purple focus:ring-brand-purple"
-                />
-                <div>
-                  <div className="flex items-center space-x-1 font-bold text-sm text-slate-900">
-                    <Banknote className="w-4 h-4 text-emerald-600" />
-                    <span>Cash on Delivery</span>
-                  </div>
-                  <span className="text-[11px] text-slate-500">Pay cash upon home delivery</span>
-                </div>
-              </label>
+            <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start space-x-3">
+              <MessageCircle className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="space-y-1 text-xs">
+                <span className="font-extrabold text-sm text-slate-900 block">Payment will be confirmed through WhatsApp</span>
+                <span className="text-slate-600 block leading-relaxed">
+                  Your order details and delivery address will be formatted for WhatsApp. Our team will contact you to confirm payment and delivery slot.
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -418,16 +304,10 @@ export const CheckoutPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-6 rounded-2xl bg-brand-gradient text-white font-extrabold text-sm shadow-brand-glow hover:shadow-pink-glow transition-all active:scale-95 flex items-center justify-center space-x-2 min-h-[48px] disabled:opacity-50"
+              className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center space-x-2.5 min-h-[52px] disabled:opacity-50"
             >
-              {loading ? (
-                <span>Processing Order...</span>
-              ) : (
-                <>
-                  <span>Place Order (₹{totalAmount.toLocaleString('en-IN')})</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
+              <MessageCircle className="w-5 h-5 fill-current" />
+              <span>{loading ? 'Submitting Order...' : `ORDER VIA WHATSAPP (₹${totalAmount.toLocaleString('en-IN')})`}</span>
             </button>
           </div>
         </div>

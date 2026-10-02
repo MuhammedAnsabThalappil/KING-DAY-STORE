@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingBag, Trash2, ArrowRight, Tag, ShieldCheck, Truck } from 'lucide-react';
+import { ShoppingBag, Trash2, ArrowRight, Tag, ShieldCheck, Truck, MessageCircle } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { SEO } from '../components/SEO';
 
@@ -195,13 +195,32 @@ export const CartPage: React.FC = () => {
               </div>
             </div>
 
-            <button
-              onClick={() => navigate('/checkout')}
-              className="w-full py-4 px-6 rounded-2xl bg-brand-gradient text-white font-extrabold text-sm shadow-brand-glow hover:shadow-pink-glow transition-all active:scale-95 flex items-center justify-center space-x-2 min-h-[48px]"
-            >
-              <span>Proceed to Mobile Checkout</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            <div className="space-y-3">
+              <a
+                href={(() => {
+                  if (!cart || cart.items.length === 0) return '#';
+                  const itemsText = cart.items.map((item, idx) => (
+                    `${idx + 1}. ${item.product.name}\n   SKU: ${item.product.sku}\n   Qty: ${item.quantity}\n   Price: ₹${Number(item.itemTotal).toLocaleString('en-IN')}`
+                  )).join('\n\n');
+                  const rawMsg = `🛍️ KING DAY Order Inquiry\n\n${itemsText}\n\n💰 Estimated Total: ₹${finalTotal.toLocaleString('en-IN')}\n\nPlease confirm availability and delivery details.\n\nThank you!`;
+                  return `https://wa.me/919495902904?text=${encodeURIComponent(rawMsg)}`;
+                })()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center space-x-2.5 min-h-[48px]"
+              >
+                <MessageCircle className="w-5 h-5 fill-current" />
+                <span>ORDER ON WHATSAPP</span>
+              </a>
+
+              <button
+                onClick={() => navigate('/checkout')}
+                className="w-full py-3 px-6 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center space-x-2 min-h-[44px]"
+              >
+                <span>Proceed to Checkout Form</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
