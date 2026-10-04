@@ -17,8 +17,16 @@ export async function getBanners(req: Request, res: Response, next: NextFunction
 
 export async function createBanner(req: Request, res: Response, next: NextFunction) {
   try {
+    const { title, subtitle, imageUrl, link, targetUrl, active, sortOrder } = req.body;
     const banner = await prisma.banner.create({
-      data: req.body
+      data: {
+        title,
+        subtitle: subtitle || null,
+        imageUrl,
+        link: link || targetUrl || null,
+        active: active !== undefined ? Boolean(active) : true,
+        sortOrder: sortOrder ? Number(sortOrder) : 0
+      }
     });
     return sendSuccess(res, banner, 'Banner created', 201);
   } catch (error) {
