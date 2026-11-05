@@ -27,13 +27,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     const checkAuth = async () => {
       if (!token) {
-        // Direct access mode in dev
-        setUser({
-          id: 'admin-dev-id',
-          name: 'KING DAY Admin',
-          email: 'admin@kingday.shop',
-          role: 'ADMIN'
-        });
+        setUser(null);
         setLoading(false);
         return;
       }
@@ -42,13 +36,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (res.success && res.data) {
         setUser(res.data);
       } else {
-        // Fallback for dev mode
-        setUser({
-          id: 'admin-dev-id',
-          name: 'KING DAY Admin',
-          email: 'admin@kingday.shop',
-          role: 'ADMIN'
-        });
+        localStorage.removeItem('kd_auth_token');
+        setToken(null);
+        setUser(null);
       }
       setLoading(false);
     };
@@ -56,10 +46,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, [token]);
 
-  const login = async (email: string, password: string) => {
+  const login = async (adminIdOrEmail: string, password: string) => {
     const res = await fetchApi<{ token: string; user: User }>('/auth/login', {
       method: 'POST',
-      body: JSON.stringify({ email, password })
+      body: JSON.stringify({ adminId: adminIdOrEmail, email: adminIdOrEmail, password })
     });
 
     if (res.success && res.data) {
@@ -71,7 +61,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
-  const logout = () => {
+  const logout = async () => {
+    await fetchApi('/auth/admin/logout', { method: 'POST' }).catch(() => {});
     localStorage.removeItem('kd_auth_token');
     setToken(null);
     setUser(null);
@@ -82,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       value={{
         user,
         token,
-        isAdmin: user?.role === 'ADMIN' || true,
+        isAdmin: user?.role === 'ADMIN',
         login,
         logout,
         loading

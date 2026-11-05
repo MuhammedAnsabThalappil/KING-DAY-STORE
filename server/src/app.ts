@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
 import apiRouter from './routes/api.js';
+import { getHealth } from './controllers/healthController.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { rateLimiter } from './middleware/rateLimiter.js';
 import { env } from './config/env.js';
@@ -49,6 +50,9 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Serve static uploaded media files
 app.use('/uploads', express.static(path.resolve(process.cwd(), 'uploads')));
+
+// Health check endpoint for Railway and load balancer probes
+app.get('/health', getHealth);
 
 // API Routes
 app.use('/api', apiRouter);

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ShieldCheck, Lock, CreditCard, Banknote, ArrowRight, Check, MessageCircle } from 'lucide-react';
+import { ShieldCheck, Lock, CreditCard, Banknote, ArrowRight, Check, MessageCircle, AlertCircle } from 'lucide-react';
 import { useCart } from '../contexts/CartContext';
 import { fetchApi } from '../api/client';
 import { Order } from '../types';
@@ -60,7 +60,7 @@ export const CheckoutPage: React.FC = () => {
     setLoading(true);
 
     try {
-      // 1. Create Order in backend with WHATSAPP payment method
+      // Create Order in backend with WHATSAPP payment method
       const orderPayload = {
         customerName: formData.name,
         customerEmail: formData.email,
@@ -95,7 +95,7 @@ export const CheckoutPage: React.FC = () => {
 
       const order = orderRes.data;
 
-      // 2. Format WhatsApp Order Message & Open WhatsApp window
+      // Format WhatsApp Order Message & Open WhatsApp window
       const itemsList = cart.items.map((i, idx) => `${idx + 1}. ${i.product.name}\n   SKU: ${i.product.sku}\n   Qty: ${i.quantity}\n   Price: ₹${Number(i.itemTotal).toLocaleString('en-IN')}`).join('\n\n');
       const rawMsg = `Hello KING DAY 👋\n\nI have placed an order on the website:\n\n📋 Order #${order.orderNumber}\n👤 Name: ${formData.name}\n📞 Phone: ${formData.phone}\n📍 Address: ${formData.addressLine1}, ${formData.city}, ${formData.state} - ${formData.pincode}\n\n🛍️ Items:\n${itemsList}\n\n💰 Total Amount: ₹${totalAmount.toLocaleString('en-IN')}\n\nPlease confirm availability and delivery details.\n\nThank you!`;
       const waUrl = `https://wa.me/919495902904?text=${encodeURIComponent(rawMsg)}`;
@@ -111,18 +111,19 @@ export const CheckoutPage: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 space-y-8">
-      <SEO title="Mobile Checkout — KING DAY STORE" />
+      <SEO title="Checkout — KING DAY STORE" />
 
       <div>
-        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">Checkout</h1>
-        <p className="text-slate-500 text-xs md:text-sm mt-0.5">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Checkout</h1>
+        <p className="text-slate-500 text-xs md:text-sm mt-0.5 font-medium">
           Enter your delivery details and choose a payment method.
         </p>
       </div>
 
       {errorMsg && (
-        <div className="p-4 bg-red-50 border border-red-200 text-red-700 text-xs md:text-sm font-bold rounded-2xl">
-          {errorMsg}
+        <div className="p-4 bg-rose-50 border border-rose-200 text-rose-700 text-xs md:text-sm font-bold rounded-2xl flex items-center space-x-2">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <span>{errorMsg}</span>
         </div>
       )}
 
@@ -130,13 +131,13 @@ export const CheckoutPage: React.FC = () => {
         {/* Left Form Column */}
         <div className="lg:col-span-7 space-y-6">
           {/* Customer Info */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
-            <h3 className="font-extrabold text-sm uppercase text-slate-800 tracking-wider">
+          <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+            <h3 className="font-extrabold text-xs uppercase text-slate-800 tracking-wider">
               1. Customer Information
             </h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Full Name *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Full Name *</label>
                 <input
                   type="text"
                   name="name"
@@ -144,11 +145,11 @@ export const CheckoutPage: React.FC = () => {
                   placeholder="e.g. Anjali Nair"
                   value={formData.name}
                   onChange={handleInputChange}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:bg-white focus:border-brand-purple"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Phone Number (10 Digits) *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Phone Number *</label>
                 <input
                   type="tel"
                   name="phone"
@@ -156,12 +157,12 @@ export const CheckoutPage: React.FC = () => {
                   placeholder="9876543210"
                   value={formData.phone}
                   onChange={handleInputChange}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:bg-white focus:border-brand-purple"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Email Address *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Email Address *</label>
               <input
                 type="email"
                 name="email"
@@ -169,18 +170,18 @@ export const CheckoutPage: React.FC = () => {
                 placeholder="anjali@example.com"
                 value={formData.email}
                 onChange={handleInputChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:bg-white focus:border-brand-purple"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all"
               />
             </div>
           </div>
 
           {/* Shipping Address */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
-            <h3 className="font-extrabold text-sm uppercase text-slate-800 tracking-wider">
+          <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+            <h3 className="font-extrabold text-xs uppercase text-slate-800 tracking-wider">
               2. Shipping Address
             </h3>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Address Line 1 *</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Address Line 1 *</label>
               <input
                 type="text"
                 name="addressLine1"
@@ -188,23 +189,23 @@ export const CheckoutPage: React.FC = () => {
                 placeholder="House/Flat No., Building Name, Street Name"
                 value={formData.addressLine1}
                 onChange={handleInputChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:bg-white focus:border-brand-purple"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Address Line 2 (Optional)</label>
+              <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Address Line 2 (Optional)</label>
               <input
                 type="text"
                 name="addressLine2"
                 placeholder="Area, Locality"
                 value={formData.addressLine2}
                 onChange={handleInputChange}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:bg-white focus:border-brand-purple"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all"
               />
             </div>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">City *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">City *</label>
                 <input
                   type="text"
                   name="city"
@@ -212,11 +213,11 @@ export const CheckoutPage: React.FC = () => {
                   placeholder="Kochi"
                   value={formData.city}
                   onChange={handleInputChange}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:bg-white focus:border-brand-purple"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">District *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">District *</label>
                 <input
                   type="text"
                   name="district"
@@ -224,11 +225,11 @@ export const CheckoutPage: React.FC = () => {
                   placeholder="Ernakulam"
                   value={formData.district}
                   onChange={handleInputChange}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:bg-white focus:border-brand-purple"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all"
                 />
               </div>
               <div>
-                <label className="block text-xs font-bold text-slate-700 mb-1">Pincode (6 Digits) *</label>
+                <label className="block text-xs font-bold text-slate-700 mb-1.5 uppercase tracking-wider">Pincode *</label>
                 <input
                   type="text"
                   name="pincode"
@@ -237,22 +238,22 @@ export const CheckoutPage: React.FC = () => {
                   placeholder="682001"
                   value={formData.pincode}
                   onChange={handleInputChange}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:bg-white focus:border-brand-purple"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-semibold text-slate-900 focus:outline-none focus:bg-white focus:border-brand-purple focus:ring-2 focus:ring-brand-purple/20 transition-all"
                 />
               </div>
             </div>
           </div>
 
           {/* Payment Method */}
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-4">
-            <h3 className="font-extrabold text-sm uppercase text-slate-800 tracking-wider">
+          <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-4">
+            <h3 className="font-extrabold text-xs uppercase text-slate-800 tracking-wider">
               3. Payment & Delivery Confirmation
             </h3>
             <div className="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-start space-x-3">
               <MessageCircle className="w-6 h-6 text-emerald-600 shrink-0 mt-0.5" />
               <div className="space-y-1 text-xs">
-                <span className="font-extrabold text-sm text-slate-900 block">Payment will be confirmed through WhatsApp</span>
-                <span className="text-slate-600 block leading-relaxed">
+                <span className="font-extrabold text-sm text-slate-900 block">Payment confirmed via WhatsApp</span>
+                <span className="text-slate-600 block leading-relaxed font-medium">
                   Your order details and delivery address will be formatted for WhatsApp. Our team will contact you to confirm payment and delivery slot.
                 </span>
               </div>
@@ -262,18 +263,18 @@ export const CheckoutPage: React.FC = () => {
 
         {/* Right Summary Column */}
         <div className="lg:col-span-5 space-y-6">
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6 sticky top-24">
-            <h3 className="font-extrabold text-lg text-slate-900 pb-3 border-b border-slate-100">
+          <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6 sticky top-24">
+            <h3 className="font-extrabold text-lg text-slate-900 pb-3 border-b border-slate-100 tracking-tight">
               Order Total
             </h3>
 
-            <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+            <div className="space-y-2.5 max-h-48 overflow-y-auto pr-1">
               {cart?.items.map((item) => (
                 <div key={item.id} className="flex items-center justify-between text-xs py-1">
                   <span className="truncate max-w-[180px] font-semibold text-slate-800">
                     {item.product.name} × {item.quantity}
                   </span>
-                  <span className="font-bold text-slate-900">
+                  <span className="font-extrabold text-slate-900">
                     ₹{Number(item.itemTotal).toLocaleString('en-IN')}
                   </span>
                 </div>
@@ -281,21 +282,21 @@ export const CheckoutPage: React.FC = () => {
             </div>
 
             <div className="space-y-2 pt-3 border-t border-slate-100 text-xs">
-              <div className="flex justify-between text-slate-600">
+              <div className="flex justify-between text-slate-600 font-medium">
                 <span>Subtotal</span>
                 <span>₹{subtotal.toLocaleString('en-IN')}</span>
               </div>
               {discountAmount > 0 && (
-                <div className="flex justify-between text-emerald-600 font-bold">
+                <div className="flex justify-between text-emerald-600 font-extrabold">
                   <span>Discount</span>
                   <span>- ₹{discountAmount.toLocaleString('en-IN')}</span>
                 </div>
               )}
-              <div className="flex justify-between text-slate-600">
+              <div className="flex justify-between text-slate-600 font-medium">
                 <span>Shipping Fee</span>
-                <span>{shippingFee === 0 ? 'FREE' : `₹${shippingFee}`}</span>
+                <span>{shippingFee === 0 ? <strong className="text-emerald-600 font-extrabold">FREE</strong> : `₹${shippingFee}`}</span>
               </div>
-              <div className="flex justify-between text-base font-black text-slate-900 pt-3 border-t border-slate-100">
+              <div className="flex justify-between text-base md:text-lg font-black text-slate-900 pt-3 border-t border-slate-100">
                 <span>Total Amount Payable</span>
                 <span>₹{totalAmount.toLocaleString('en-IN')}</span>
               </div>
@@ -304,7 +305,7 @@ export const CheckoutPage: React.FC = () => {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center space-x-2.5 min-h-[52px] disabled:opacity-50"
+              className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center space-x-2.5 min-h-[52px] disabled:opacity-50 active:scale-[0.98]"
             >
               <MessageCircle className="w-5 h-5 fill-current" />
               <span>{loading ? 'Submitting Order...' : `ORDER VIA WHATSAPP (₹${totalAmount.toLocaleString('en-IN')})`}</span>
@@ -315,3 +316,4 @@ export const CheckoutPage: React.FC = () => {
     </div>
   );
 };
+

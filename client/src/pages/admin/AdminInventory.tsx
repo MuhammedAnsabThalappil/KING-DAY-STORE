@@ -3,7 +3,10 @@ import { Boxes, AlertTriangle, PlusCircle, MinusCircle, History } from 'lucide-r
 import { fetchApi } from '../../api/client';
 import { SEO } from '../../components/SEO';
 
+import { useToast } from '../../contexts/ToastContext';
+
 export const AdminInventory: React.FC = () => {
+  const { toast } = useToast();
   const [inventoryData, setInventoryData] = useState<any>(null);
   const [transactions, setTransactions] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,7 +25,17 @@ export const AdminInventory: React.FC = () => {
       fetchApi<any[]>('/inventory/transactions')
     ]);
 
-    if (invRes.success && invRes.data) setInventoryData(invRes.data);
+    if (invRes.success && invRes.data) {
+      setInventoryData(invRes.data);
+      // Check for low stock or out of stock items
+      invRes.data.inventories?.forEach((inv: any) => {
+        if (inv.availableQuantity <= 0) {
+          toast.error(`Product "${inv.product?.name || 'Item'}" is out of stock`);
+        } else if (inv.availableQuantity <= (inv.lowStockThreshold || 3)) {
+          toast.warning(`Low stock: ${inv.availableQuantity} units remaining`);
+        }
+      });
+    }
     if (txRes.success && txRes.data) setTransactions(txRes.data);
     setLoading(false);
   };
@@ -46,9 +59,12 @@ export const AdminInventory: React.FC = () => {
     });
 
     if (res.success) {
+      toast.success('Inventory updated successfully');
       setAdjustModalOpen(false);
       setAdjustNote('');
       loadData();
+    } else {
+      toast.error('Failed to adjust inventory stock.');
     }
   };
 
@@ -182,56 +198,56 @@ export const AdminInventory: React.FC = () => {
 
             <form onSubmit={handleStockAdjustment} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-400 mb-1">Select Product *</label>
+                <label className="block font-semibold text-slate-300 mb-1.5">Select Product *</label>
                 <select
                   value={selectedProductId}
                   onChange={(e) => setSelectedProductId(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                  className="form-input-dark"
                 >
                   {inventoryData?.inventories?.map((inv: any) => (
-                    <option key={inv.productId} value={inv.productId}>
+                    <option key={inv.productId} value={inv.productId} className="bg-slate-900 text-white">
                       {inv.product?.name} ({inv.product?.sku}) — Avail: {inv.availableQuantity}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-400 mb-1">Adjustment Type *</label>
+                  <label className="block font-semibold text-slate-300 mb-1.5">Adjustment Type *</label>
                   <select
                     value={adjustType}
                     onChange={(e) => setAdjustType(e.target.value as any)}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                    className="form-input-dark"
                   >
-                    <option value="PURCHASE">PURCHASE (Stock In +)</option>
-                    <option value="RETURN">RETURN (Stock In +)</option>
-                    <option value="DAMAGE">DAMAGE (Stock Out -)</option>
-                    <option value="ADJUSTMENT">ADJUSTMENT (Stock Out -)</option>
+                    <option value="PURCHASE" className="bg-slate-900 text-white">PURCHASE (Stock In +)</option>
+                    <option value="RETURN" className="bg-slate-900 text-white">RETURN (Stock In +)</option>
+                    <option value="DAMAGE" className="bg-slate-900 text-white">DAMAGE (Stock Out -)</option>
+                    <option value="ADJUSTMENT" className="bg-slate-900 text-white">ADJUSTMENT (Stock Out -)</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-400 mb-1">Quantity *</label>
+                  <label className="block font-semibold text-slate-300 mb-1.5">Quantity *</label>
                   <input
                     type="number"
                     min={1}
                     value={adjustQty}
                     onChange={(e) => setAdjustQty(parseInt(e.target.value, 10))}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                    className="form-input-dark"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-400 mb-1">Audit Note / Reason *</label>
+                <label className="block font-semibold text-slate-300 mb-1.5">Audit Note / Reason *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. Received new shipment batch #4"
                   value={adjustNote}
                   onChange={(e) => setAdjustNote(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                  className="form-input-dark"
                 />
               </div>
 
@@ -239,13 +255,13 @@ export const AdminInventory: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setAdjustModalOpen(false)}
-                  className="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 font-bold"
+                  className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold min-h-[44px]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-xl bg-brand-purple text-white font-bold hover:bg-brand-pink transition-all"
+                  className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-brand-purple to-brand-pink text-white font-bold hover:shadow-brand-glow transition-all min-h-[44px]"
                 >
                   Execute Stock Change
                 </button>

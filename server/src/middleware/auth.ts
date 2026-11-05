@@ -17,8 +17,8 @@ export interface AuthenticatedRequest extends Request {
 export function authenticate(req: AuthenticatedRequest, res: Response, next: NextFunction) {
   const authHeader = req.headers.authorization;
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    // For direct access dev mode or unauthenticated fallback if dev mode specified
-    if (req.headers['x-admin-dev-access'] === 'true') {
+    // Dev access override ONLY when running in development environment
+    if (env.NODE_ENV === 'development' && req.headers['x-admin-dev-access'] === 'true') {
       req.user = {
         id: 'admin-dev-id',
         email: 'admin@kingday.shop',

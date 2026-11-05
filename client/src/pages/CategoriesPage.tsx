@@ -25,21 +25,21 @@ export const CategoriesPage: React.FC = () => {
         description="Explore all categories of electric ride-ons, cycles, tricycles, toys, and baby strollers at KING DAY."
       />
 
-      <div>
-        <h1 className="text-3xl font-extrabold text-slate-900">All Product Categories</h1>
-        <p className="text-slate-500 text-sm mt-1">
+      <div className="border-b border-slate-200 pb-4">
+        <h1 className="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">All Product Categories</h1>
+        <p className="text-slate-500 text-xs md:text-sm mt-1 font-medium">
           Browse through our curated collection of children's ride-ons, cycles, toys, and essentials.
         </p>
       </div>
 
       {loading ? (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div key={i} className="h-64 bg-slate-200 rounded-2xl animate-pulse" />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
           {categories.map((cat) => (
             <CategoryCard key={cat.id} category={cat} />
           ))}
@@ -48,3 +48,4 @@ export const CategoriesPage: React.FC = () => {
     </div>
   );
 };
+

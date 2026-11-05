@@ -9,7 +9,8 @@ import {
   RotateCcw,
   Check,
   Zap,
-  ChevronRight
+  ChevronRight,
+  Award
 } from 'lucide-react';
 import { fetchApi } from '../api/client';
 import { Product } from '../types';
@@ -59,12 +60,12 @@ export const ProductDetailPage: React.FC = () => {
   if (loading) {
     return (
       <div className="max-w-7xl mx-auto px-4 py-12 animate-pulse space-y-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           <div className="h-96 bg-slate-200 rounded-3xl" />
           <div className="space-y-4">
             <div className="h-8 bg-slate-200 w-3/4 rounded-xl" />
             <div className="h-6 bg-slate-200 w-1/4 rounded-lg" />
-            <div className="h-20 bg-slate-200 rounded-xl" />
+            <div className="h-24 bg-slate-200 rounded-2xl" />
           </div>
         </div>
       </div>
@@ -73,10 +74,11 @@ export const ProductDetailPage: React.FC = () => {
 
   if (!product) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h2 className="text-2xl font-bold text-slate-800">Product Not Found</h2>
-        <Link to="/shop" className="text-brand-purple font-bold text-sm underline mt-2 inline-block">
-          Return to Shop
+      <div className="max-w-7xl mx-auto px-4 py-16 text-center space-y-4">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900">Product Not Found</h2>
+        <p className="text-slate-500 text-xs md:text-sm">The product you are looking for might have been moved or renamed.</p>
+        <Link to="/shop" className="inline-block px-6 py-3 rounded-full bg-brand-purple text-white font-extrabold text-xs shadow-md">
+          Return to Shop Catalog
         </Link>
       </div>
     );
@@ -116,20 +118,20 @@ export const ProductDetailPage: React.FC = () => {
       />
 
       {/* Breadcrumb Navigation */}
-      <nav className="flex items-center space-x-2 text-xs font-semibold text-slate-500 overflow-x-auto pb-2">
-        <Link to="/" className="hover:text-brand-purple">Home</Link>
-        <ChevronRight className="w-3.5 h-3.5" />
-        <Link to="/shop" className="hover:text-brand-purple">Shop</Link>
+      <nav className="flex items-center space-x-2 text-xs font-semibold text-slate-500 overflow-x-auto pb-1">
+        <Link to="/" className="hover:text-brand-purple transition-colors">Home</Link>
+        <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+        <Link to="/shop" className="hover:text-brand-purple transition-colors">Shop</Link>
         {product.category && (
           <>
-            <ChevronRight className="w-3.5 h-3.5" />
-            <Link to={`/category/${product.category.slug}`} className="hover:text-brand-purple">
+            <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+            <Link to={`/category/${product.category.slug}`} className="hover:text-brand-purple transition-colors">
               {product.category.name}
             </Link>
           </>
         )}
-        <ChevronRight className="w-3.5 h-3.5 text-slate-300" />
-        <span className="text-slate-800 truncate max-w-xs">{product.name}</span>
+        <ChevronRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+        <span className="text-slate-900 font-extrabold truncate max-w-xs">{product.name}</span>
       </nav>
 
       {/* Product Main Container */}
@@ -143,13 +145,13 @@ export const ProductDetailPage: React.FC = () => {
               className="w-full h-full object-cover object-center"
             />
             {product.discount > 0 && (
-              <span className="absolute top-4 left-4 bg-brand-pink text-white font-extrabold text-xs px-3.5 py-1.5 rounded-full shadow-lg">
+              <span className="absolute top-4 left-4 bg-gradient-to-r from-brand-pink to-rose-500 text-white font-extrabold text-xs px-3.5 py-1.5 rounded-full shadow-md tracking-wider">
                 {Math.round(product.discount)}% OFF
               </span>
             )}
             <button
               onClick={() => toggleWishlist(product)}
-              className="absolute top-4 right-4 p-3 rounded-full bg-white/90 backdrop-blur-md shadow-md text-slate-600 hover:text-brand-pink transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+              className="absolute top-4 right-4 p-3 rounded-full bg-white/90 backdrop-blur-md shadow-md text-slate-600 hover:text-brand-pink transition-all active:scale-90 min-h-[44px] min-w-[44px] flex items-center justify-center"
               aria-label="Wishlist"
             >
               <Heart className={`w-6 h-6 ${isSaved ? 'fill-brand-pink text-brand-pink' : ''}`} />
@@ -164,7 +166,7 @@ export const ProductDetailPage: React.FC = () => {
                   key={img.id}
                   onClick={() => setSelectedImage(img.imageUrl)}
                   className={`w-20 h-20 rounded-xl overflow-hidden border-2 shrink-0 transition-all ${
-                    selectedImage === img.imageUrl ? 'border-brand-purple shadow-md scale-95' : 'border-slate-200'
+                    selectedImage === img.imageUrl ? 'border-brand-purple shadow-md scale-95' : 'border-slate-200 hover:border-slate-300'
                   }`}
                 >
                   <img src={img.imageUrl} alt={product.name} className="w-full h-full object-cover" />
@@ -178,41 +180,41 @@ export const ProductDetailPage: React.FC = () => {
         <div className="lg:col-span-6 space-y-6 flex flex-col justify-between">
           <div className="space-y-4">
             <div className="flex items-center justify-between text-xs font-bold text-slate-400">
-              <span className="bg-slate-100 text-slate-700 px-3 py-1 rounded-full uppercase">
+              <span className="bg-slate-100 text-brand-purple font-extrabold px-3 py-1 rounded-full uppercase tracking-wider">
                 {product.brand || 'KING DAY'}
               </span>
-              <span>SKU: {product.sku}</span>
+              <span className="font-mono bg-slate-100 text-slate-700 px-2 py-0.5 rounded">SKU: {product.sku}</span>
             </div>
 
-            <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 leading-tight">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-extrabold text-slate-900 leading-tight tracking-tight">
               {product.name}
             </h1>
 
             {product.shortDescription && (
-              <p className="text-slate-600 text-sm leading-relaxed border-l-2 border-brand-purple pl-3">
+              <p className="text-slate-600 text-sm leading-relaxed border-l-4 border-brand-purple pl-3.5 py-0.5 font-medium">
                 {product.shortDescription}
               </p>
             )}
 
             {/* Price Box */}
-            <div className="p-4 bg-slate-50 rounded-2xl border border-slate-100 flex items-baseline justify-between">
+            <div className="p-4 md:p-5 bg-slate-50 rounded-2xl border border-slate-100/90 flex flex-wrap items-center justify-between gap-3">
               <div className="flex items-baseline space-x-3">
-                <span className="text-3xl font-black text-slate-900">
+                <span className="text-3xl md:text-4xl font-black text-slate-900">
                   ₹{Number(product.salePrice).toLocaleString('en-IN')}
                 </span>
                 {product.mrp > product.salePrice && (
-                  <span className="text-base text-slate-400 line-through">
+                  <span className="text-base text-slate-400 line-through font-semibold">
                     ₹{Number(product.mrp).toLocaleString('en-IN')}
                   </span>
                 )}
               </div>
               <div>
                 {isOutOfStock ? (
-                  <span className="text-xs font-bold text-red-600 bg-red-100 px-3 py-1 rounded-full">
+                  <span className="text-xs font-extrabold text-rose-700 bg-rose-100 px-3 py-1 rounded-full uppercase">
                     Out of Stock
                   </span>
                 ) : (
-                  <span className="text-xs font-bold text-emerald-700 bg-emerald-100 px-3 py-1 rounded-full flex items-center space-x-1">
+                  <span className="text-xs font-extrabold text-emerald-800 bg-emerald-100 px-3.5 py-1.5 rounded-full flex items-center space-x-1.5">
                     <Check className="w-3.5 h-3.5" />
                     <span>In Stock ({availableStock} available)</span>
                   </span>
@@ -222,16 +224,16 @@ export const ProductDetailPage: React.FC = () => {
 
             {/* Quantity Selector */}
             {!isOutOfStock && (
-              <div className="flex items-center space-x-4">
-                <label className="text-xs font-bold text-slate-700 uppercase">Quantity:</label>
-                <div className="flex items-center border border-slate-200 rounded-xl bg-white overflow-hidden shadow-sm">
+              <div className="flex items-center space-x-4 pt-1">
+                <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider">Quantity:</label>
+                <div className="flex items-center border border-slate-200 rounded-xl bg-white overflow-hidden shadow-2xs">
                   <button
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     className="px-3.5 py-2 font-extrabold text-slate-600 hover:bg-slate-100 transition-colors min-h-[44px] min-w-[44px]"
                   >
                     -
                   </button>
-                  <span className="px-4 font-bold text-sm text-slate-900">{quantity}</span>
+                  <span className="px-4 font-extrabold text-sm text-slate-900">{quantity}</span>
                   <button
                     onClick={() => setQuantity((q) => Math.min(availableStock, q + 1))}
                     className="px-3.5 py-2 font-extrabold text-slate-600 hover:bg-slate-100 transition-colors min-h-[44px] min-w-[44px]"
@@ -249,7 +251,7 @@ export const ProductDetailPage: React.FC = () => {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-4 px-6 rounded-2xl font-extrabold text-sm md:text-base bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center space-x-2.5 min-h-[52px]"
+              className="w-full py-4 px-6 rounded-2xl font-extrabold text-sm md:text-base bg-emerald-600 hover:bg-emerald-700 text-white transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center space-x-2.5 min-h-[52px] active:scale-[0.98]"
             >
               <MessageCircle className="w-6 h-6 fill-current" />
               <span>BUY THROUGH WHATSAPP</span>
@@ -260,7 +262,7 @@ export const ProductDetailPage: React.FC = () => {
               <button
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className={`w-full py-3 px-4 rounded-xl font-bold text-xs md:text-sm flex items-center justify-center space-x-1.5 transition-all min-h-[44px] ${
+                className={`w-full py-3.5 px-4 rounded-xl font-extrabold text-xs md:text-sm flex items-center justify-center space-x-1.5 transition-all min-h-[44px] active:scale-[0.98] ${
                   added
                     ? 'bg-emerald-100 text-emerald-800'
                     : isOutOfStock
@@ -268,14 +270,14 @@ export const ProductDetailPage: React.FC = () => {
                     : 'bg-slate-100 hover:bg-slate-200 text-slate-800'
                 }`}
               >
-                {added ? <Check className="w-4 h-4" /> : <ShoppingBag className="w-4 h-4" />}
+                {added ? <Check className="w-4 h-4 text-emerald-700" /> : <ShoppingBag className="w-4 h-4" />}
                 <span>{added ? 'Added to Cart' : 'ADD TO CART'}</span>
               </button>
 
               <button
                 onClick={handleBuyNow}
                 disabled={isOutOfStock}
-                className="w-full py-3 px-4 rounded-xl font-bold text-xs md:text-sm bg-brand-purple hover:bg-brand-blue text-white transition-all min-h-[44px] flex items-center justify-center space-x-1"
+                className="w-full py-3.5 px-4 rounded-xl font-extrabold text-xs md:text-sm bg-brand-purple hover:bg-brand-blue text-white transition-all min-h-[44px] shadow-sm flex items-center justify-center space-x-1.5 active:scale-[0.98]"
               >
                 <Zap className="w-4 h-4 fill-current" />
                 <span>BUY NOW</span>
@@ -285,34 +287,34 @@ export const ProductDetailPage: React.FC = () => {
 
           {/* Delivery & Warranty Guarantees */}
           <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-100 text-center">
-            <div className="p-3 bg-slate-50 rounded-xl space-y-1">
+            <div className="p-3 bg-slate-50 rounded-2xl space-y-1">
               <Truck className="w-5 h-5 mx-auto text-brand-purple" />
-              <span className="block text-[11px] font-bold text-slate-700">Insured Shipping</span>
+              <span className="block text-[11px] font-extrabold text-slate-800">Insured Shipping</span>
             </div>
-            <div className="p-3 bg-slate-50 rounded-xl space-y-1">
+            <div className="p-3 bg-slate-50 rounded-2xl space-y-1">
               <ShieldCheck className="w-5 h-5 mx-auto text-brand-pink" />
-              <span className="block text-[11px] font-bold text-slate-700">Authentic Build</span>
+              <span className="block text-[11px] font-extrabold text-slate-800">Authentic Build</span>
             </div>
-            <div className="p-3 bg-slate-50 rounded-xl space-y-1">
-              <RotateCcw className="w-5 h-5 mx-auto text-brand-blue" />
-              <span className="block text-[11px] font-bold text-slate-700">7-Day Support</span>
+            <div className="p-3 bg-slate-50 rounded-2xl space-y-1">
+              <Award className="w-5 h-5 mx-auto text-brand-blue" />
+              <span className="block text-[11px] font-extrabold text-slate-800">Direct Guarantee</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Description, Features & Specifications Tabs */}
+      {/* Description & Specifications */}
       <div className="bg-white rounded-3xl p-6 md:p-10 border border-slate-100 shadow-sm space-y-8">
         <div>
           <h3 className="text-xl font-extrabold text-slate-900 mb-4 pb-2 border-b border-slate-100">
             Product Description
           </h3>
-          <div className="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+          <div className="prose prose-slate max-w-none text-slate-700 text-sm leading-relaxed whitespace-pre-line font-medium">
             {product.description}
           </div>
         </div>
 
-        {/* Features Bullet List */}
+        {/* Features List */}
         {product.features && product.features.length > 0 && (
           <div>
             <h3 className="text-xl font-extrabold text-slate-900 mb-4 pb-2 border-b border-slate-100">
@@ -320,7 +322,7 @@ export const ProductDetailPage: React.FC = () => {
             </h3>
             <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {product.features.map((feat) => (
-                <li key={feat.id} className="flex items-start space-x-2.5 text-sm text-slate-700">
+                <li key={feat.id} className="flex items-start space-x-2.5 text-sm text-slate-700 font-medium">
                   <div className="w-5 h-5 rounded-full bg-brand-purple/10 text-brand-purple flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">
                     ✓
                   </div>
@@ -331,7 +333,7 @@ export const ProductDetailPage: React.FC = () => {
           </div>
         )}
 
-        {/* Specifications Table */}
+        {/* Technical Specs */}
         {product.specifications && product.specifications.length > 0 && (
           <div>
             <h3 className="text-xl font-extrabold text-slate-900 mb-4 pb-2 border-b border-slate-100">
@@ -339,9 +341,9 @@ export const ProductDetailPage: React.FC = () => {
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {product.specifications.map((spec) => (
-                <div key={spec.id} className="flex items-center justify-between p-3 bg-slate-50 rounded-xl text-xs">
+                <div key={spec.id} className="flex items-center justify-between p-3.5 bg-slate-50 rounded-xl text-xs">
                   <span className="font-bold text-slate-500">{spec.name}</span>
-                  <span className="font-semibold text-slate-900">{spec.value}</span>
+                  <span className="font-extrabold text-slate-900">{spec.value}</span>
                 </div>
               ))}
             </div>
@@ -353,7 +355,7 @@ export const ProductDetailPage: React.FC = () => {
       {relatedProducts.length > 0 && (
         <div className="space-y-6">
           <h3 className="text-2xl font-extrabold text-slate-900">You May Also Like</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 md:gap-6">
             {relatedProducts.map((rel) => (
               <ProductCard key={rel.id} product={rel} />
             ))}
@@ -364,17 +366,17 @@ export const ProductDetailPage: React.FC = () => {
       {/* Mobile Sticky Bottom Purchase Bar */}
       <div
         className="md:hidden fixed bottom-16 left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-t border-slate-200 p-3 shadow-2xl flex items-center justify-between space-x-3"
-        style={{ paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
+        style={{ paddingBottom: 'calc(0.5rem + env(safe-area-inset-bottom))' }}
       >
         <div className="truncate">
-          <span className="block text-[10px] text-slate-400 font-bold uppercase truncate">{product.name}</span>
-          <span className="text-base font-extrabold text-slate-900">₹{Number(product.salePrice).toLocaleString('en-IN')}</span>
+          <span className="block text-[10px] text-slate-500 font-bold uppercase truncate">{product.name}</span>
+          <span className="text-base font-black text-slate-900">₹{Number(product.salePrice).toLocaleString('en-IN')}</span>
         </div>
         <a
           href={whatsappUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs flex items-center space-x-1.5 shrink-0 shadow-md min-h-[44px]"
+          className="px-4 py-2.5 rounded-xl bg-emerald-600 text-white font-extrabold text-xs flex items-center space-x-1.5 shrink-0 shadow-md min-h-[44px] active:scale-95"
         >
           <MessageCircle className="w-4 h-4 fill-current" />
           <span>BUY ON WHATSAPP</span>
@@ -383,3 +385,4 @@ export const ProductDetailPage: React.FC = () => {
     </div>
   );
 };
+

@@ -26,18 +26,18 @@ export const CartPage: React.FC = () => {
     return (
       <div className="max-w-4xl mx-auto px-4 py-16 text-center space-y-6">
         <SEO title="Shopping Cart — KING DAY STORE" />
-        <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mx-auto">
-          <ShoppingBag className="w-10 h-10" />
+        <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-400 mx-auto shadow-inner">
+          <ShoppingBag className="w-10 h-10 text-brand-purple" />
         </div>
-        <h2 className="text-2xl font-extrabold text-slate-800">Your Shopping Cart is Empty</h2>
-        <p className="text-slate-500 text-sm max-w-sm mx-auto">
+        <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">Your Shopping Cart is Empty</h2>
+        <p className="text-slate-500 text-xs md:text-sm max-w-sm mx-auto leading-relaxed">
           Explore our collection of luxury electric ride-ons, cycles, and toys to add products to your cart.
         </p>
         <Link
           to="/shop"
-          className="inline-flex items-center space-x-2 px-8 py-3.5 rounded-full bg-brand-purple text-white font-bold text-sm shadow-brand-glow hover:bg-brand-blue transition-all"
+          className="inline-flex items-center space-x-2 px-8 py-3.5 rounded-full bg-brand-purple text-white font-extrabold text-xs md:text-sm shadow-brand-glow hover:bg-brand-blue transition-all active:scale-95 min-h-[44px]"
         >
-          <span>Start Shopping</span>
+          <span>Start Shopping Catalog</span>
           <ArrowRight className="w-4 h-4" />
         </Link>
       </div>
@@ -49,12 +49,12 @@ export const CartPage: React.FC = () => {
       <SEO title="Shopping Cart — KING DAY STORE" />
 
       <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900">
+        <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight">
           Shopping Cart ({cart.totalItems} Items)
         </h1>
         <button
           onClick={clearCart}
-          className="text-xs font-bold text-red-500 hover:text-red-700 flex items-center space-x-1"
+          className="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center space-x-1 transition-colors min-h-[44px] px-2"
         >
           <Trash2 className="w-4 h-4" />
           <span>Clear Cart</span>
@@ -67,7 +67,7 @@ export const CartPage: React.FC = () => {
           {cart.items.map((item) => (
             <div
               key={item.id}
-              className="p-4 md:p-6 bg-white rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between gap-4"
+              className="p-4 md:p-6 bg-white rounded-3xl border border-slate-100 shadow-2xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 transition-all hover:border-slate-200"
             >
               <div className="flex items-center space-x-4">
                 <img
@@ -77,41 +77,41 @@ export const CartPage: React.FC = () => {
                     'https://images.unsplash.com/photo-1594787318286-3d835c1d207f?auto=format&fit=crop&w=300&q=80'
                   }
                   alt={item.product.name}
-                  className="w-20 h-20 md:w-24 md:h-24 rounded-xl object-cover bg-slate-50 shrink-0"
+                  className="w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover bg-slate-50 shrink-0 border border-slate-100"
                 />
                 <div className="space-y-1">
-                  <span className="text-[10px] font-bold uppercase text-slate-400">
+                  <span className="text-[10px] font-mono font-bold uppercase text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded">
                     {item.product.sku}
                   </span>
                   <Link
                     to={`/product/${item.product.slug}`}
-                    className="font-bold text-slate-900 text-sm md:text-base hover:text-brand-purple line-clamp-2 block"
+                    className="font-bold text-slate-900 text-sm md:text-base hover:text-brand-purple line-clamp-2 transition-colors"
                   >
                     {item.product.name}
                   </Link>
-                  <p className="text-xs font-bold text-slate-500">
+                  <p className="text-xs font-extrabold text-slate-500">
                     ₹{Number(item.currentPrice).toLocaleString('en-IN')} each
                   </p>
                 </div>
               </div>
 
-              <div className="flex flex-col items-end justify-between space-y-3 shrink-0">
-                <span className="text-base md:text-lg font-black text-slate-900">
+              <div className="flex sm:flex-col items-center sm:items-end justify-between w-full sm:w-auto space-y-0 sm:space-y-3 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100 shrink-0">
+                <span className="text-base md:text-xl font-black text-slate-900">
                   ₹{Number(item.itemTotal).toLocaleString('en-IN')}
                 </span>
 
                 <div className="flex items-center space-x-2">
-                  <div className="flex items-center border border-slate-200 rounded-lg bg-slate-50 overflow-hidden">
+                  <div className="flex items-center border border-slate-200 rounded-xl bg-slate-50/80 overflow-hidden shadow-2xs">
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                      className="px-2.5 py-1 font-bold text-slate-600 hover:bg-slate-200 transition-colors min-h-[44px] min-w-[44px]"
+                      className="px-3 py-1 font-extrabold text-slate-600 hover:bg-slate-200 transition-colors min-h-[44px] min-w-[44px]"
                     >
                       -
                     </button>
-                    <span className="px-3 text-xs font-bold text-slate-900">{item.quantity}</span>
+                    <span className="px-3 text-xs font-extrabold text-slate-900">{item.quantity}</span>
                     <button
                       onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                      className="px-2.5 py-1 font-bold text-slate-600 hover:bg-slate-200 transition-colors min-h-[44px] min-w-[44px]"
+                      className="px-3 py-1 font-extrabold text-slate-600 hover:bg-slate-200 transition-colors min-h-[44px] min-w-[44px]"
                     >
                       +
                     </button>
@@ -119,7 +119,7 @@ export const CartPage: React.FC = () => {
 
                   <button
                     onClick={() => removeFromCart(item.id)}
-                    className="p-2 text-slate-400 hover:text-red-500 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+                    className="p-2 text-slate-400 hover:text-rose-600 transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl hover:bg-rose-50"
                     title="Remove item"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -132,14 +132,14 @@ export const CartPage: React.FC = () => {
 
         {/* Order Summary & Coupon Card */}
         <div className="lg:col-span-4 space-y-6">
-          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm space-y-6">
-            <h3 className="font-extrabold text-lg text-slate-900 pb-3 border-b border-slate-100">
+          <div className="bg-white p-6 md:p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6 sticky top-24">
+            <h3 className="font-extrabold text-lg text-slate-900 pb-3 border-b border-slate-100 tracking-tight">
               Order Summary
             </h3>
 
             {/* Coupon Code Input */}
             <form onSubmit={handleApplyCoupon} className="space-y-2">
-              <label className="text-xs font-bold text-slate-600 uppercase flex items-center space-x-1">
+              <label className="text-xs font-extrabold text-slate-700 uppercase tracking-wider flex items-center space-x-1.5">
                 <Tag className="w-3.5 h-3.5 text-brand-purple" />
                 <span>Have a Promo Code?</span>
               </label>
@@ -153,20 +153,20 @@ export const CartPage: React.FC = () => {
                 />
                 <button
                   type="submit"
-                  className="px-4 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold hover:bg-brand-purple transition-colors min-h-[44px]"
+                  className="px-4 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-extrabold hover:bg-brand-purple transition-all min-h-[44px] active:scale-95"
                 >
                   Apply
                 </button>
               </div>
               {couponMsg && (
-                <p className={`text-xs font-bold ${couponMsg.success ? 'text-emerald-600' : 'text-red-500'}`}>
+                <p className={`text-xs font-bold ${couponMsg.success ? 'text-emerald-600' : 'text-rose-600'}`}>
                   {couponMsg.message}
                 </p>
               )}
               {appliedCoupon && (
-                <div className="flex items-center justify-between p-2 bg-emerald-50 rounded-xl text-xs font-bold text-emerald-800">
+                <div className="flex items-center justify-between p-2.5 bg-emerald-50 rounded-xl text-xs font-extrabold text-emerald-800 border border-emerald-200">
                   <span>Code: {appliedCoupon.code}</span>
-                  <button onClick={removeCoupon} className="text-red-500 text-[10px] underline">
+                  <button onClick={removeCoupon} className="text-rose-600 text-[10px] underline">
                     Remove
                   </button>
                 </div>
@@ -180,16 +180,16 @@ export const CartPage: React.FC = () => {
                 <span>₹{subtotal.toLocaleString('en-IN')}</span>
               </div>
               {discountAmount > 0 && (
-                <div className="flex justify-between text-emerald-600 font-bold">
+                <div className="flex justify-between text-emerald-600 font-extrabold">
                   <span>Coupon Discount</span>
                   <span>- ₹{discountAmount.toLocaleString('en-IN')}</span>
                 </div>
               )}
               <div className="flex justify-between text-slate-600 font-medium">
                 <span>Estimated Shipping</span>
-                <span>{shippingFee === 0 ? <strong className="text-emerald-600">FREE</strong> : `₹${shippingFee}`}</span>
+                <span>{shippingFee === 0 ? <strong className="text-emerald-600 font-extrabold">FREE</strong> : `₹${shippingFee}`}</span>
               </div>
-              <div className="flex justify-between text-base font-black text-slate-900 pt-3 border-t border-slate-100">
+              <div className="flex justify-between text-lg font-black text-slate-900 pt-3 border-t border-slate-100">
                 <span>Total Amount</span>
                 <span>₹{finalTotal.toLocaleString('en-IN')}</span>
               </div>
@@ -207,7 +207,7 @@ export const CartPage: React.FC = () => {
                 })()}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center space-x-2.5 min-h-[48px]"
+                className="w-full py-4 px-6 rounded-2xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-sm transition-all shadow-lg shadow-emerald-600/20 flex items-center justify-center space-x-2.5 min-h-[48px] active:scale-[0.98]"
               >
                 <MessageCircle className="w-5 h-5 fill-current" />
                 <span>ORDER ON WHATSAPP</span>
@@ -215,10 +215,10 @@ export const CartPage: React.FC = () => {
 
               <button
                 onClick={() => navigate('/checkout')}
-                className="w-full py-3 px-6 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center space-x-2 min-h-[44px]"
+                className="w-full py-3.5 px-6 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center space-x-2 min-h-[44px] transition-colors"
               >
                 <span>Proceed to Checkout Form</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <ArrowRight className="w-4 h-4" />
               </button>
             </div>
           </div>
@@ -227,3 +227,4 @@ export const CartPage: React.FC = () => {
     </div>
   );
 };
+

@@ -13,12 +13,16 @@ export async function createOrder(req: Request, res: Response, next: NextFunctio
 
 export async function getOrders(req: Request, res: Response, next: NextFunction) {
   try {
-    const customerId = (req as any).user?.id || (req.query.customerId as string);
+    const user = (req as any).user;
+    // Admins see all orders; a non-admin user would only see their own (future feature)
+    const isAdmin = user?.role === 'ADMIN' || user?.role === 'STAFF' || user?.id === 'admin-dev-id';
+    const customerId = isAdmin ? (req.query.customerId as string | undefined) : user?.id;
+
     const status = req.query.status as any;
     const paymentStatus = req.query.paymentStatus as any;
     const search = req.query.search as string;
     const page = req.query.page ? parseInt(req.query.page as string, 10) : 1;
-    const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 15;
+    const limit = Math.min(100, req.query.limit ? parseInt(req.query.limit as string, 10) : 15);
 
     const result = await OrderService.getOrders({
       customerId,
@@ -43,6 +47,24 @@ export async function getOrderById(req: Request, res: Response, next: NextFuncti
       return sendError(res, `Order not found with identifier: ${id}`, 'NOT_FOUND', 404);
     }
     return sendSuccess(res, order, 'Order details loaded');
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function trackOrderByNumber(req: Request, res: Response, next: NextFunction) {
+  try {
+    const orderNumber = (req.query.orderNumber || req.query.id || req.query.q) as string;
+    if (!orderNumber || !orderNumber.trim()) {
+      return sendError(res, 'Order reference number is required to track order', 'BAD_REQUEST', 400);
+    }
+
+    const order = await OrderService.getOrderById(orderNumber.trim());
+    if (!order) {
+      return sendError(res, `No order found with reference number: ${orderNumber.trim()}`, 'NOT_FOUND', 404);
+    }
+
+    return sendSuccess(res, order, 'Order tracking details loaded');
   } catch (error) {
     next(error);
   }

@@ -45,21 +45,21 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const whatsappUrl = `https://wa.me/919495902904?text=${encodeURIComponent(rawMsg)}`;
 
   return (
-    <div className="group relative bg-white rounded-2xl border border-slate-100 shadow-2xs hover:shadow-premium transition-all duration-300 flex flex-col justify-between overflow-hidden">
+    <div className="group relative bg-white rounded-2xl border border-slate-100 shadow-2xs hover:shadow-premium hover:-translate-y-1 transition-all duration-300 flex flex-col justify-between overflow-hidden">
       {/* Top Image Section */}
       <div className="relative aspect-square overflow-hidden bg-slate-50">
         <Link to={`/product/${product.slug}`} className="block w-full h-full">
           <img
             src={primaryImage}
             alt={product.name}
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
             loading="lazy"
           />
         </Link>
 
         {/* Discount Badge */}
         {product.discount > 0 && (
-          <div className="absolute top-2 left-2 bg-brand-pink text-white font-bold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full shadow-sm tracking-wider">
+          <div className="absolute top-2.5 left-2.5 bg-gradient-to-r from-brand-pink to-rose-500 text-white font-extrabold text-[10px] md:text-xs px-2.5 py-0.5 rounded-full shadow-sm tracking-wider">
             {Math.round(product.discount)}% OFF
           </div>
         )}
@@ -68,7 +68,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         <button
           onClick={handleWishlistToggle}
           aria-label="Add to wishlist"
-          className="absolute top-2 right-2 w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 backdrop-blur-md shadow-2xs flex items-center justify-center text-slate-600 hover:text-brand-pink hover:bg-white transition-colors min-h-[44px] min-w-[44px]"
+          className="absolute top-2.5 right-2.5 w-9 h-9 md:w-10 md:h-10 rounded-full bg-white/90 backdrop-blur-md shadow-2xs flex items-center justify-center text-slate-600 hover:text-brand-pink hover:bg-white transition-all active:scale-90 min-h-[44px] min-w-[44px]"
         >
           <Heart
             className={`w-4 h-4 md:w-5 md:h-5 transition-colors ${
@@ -77,34 +77,34 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           />
         </button>
 
-        {/* Stock status overlay if out of stock */}
+        {/* Out of stock overlay */}
         {isOutOfStock && (
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-[2px] flex items-center justify-center">
-            <span className="bg-red-600 text-white font-semibold text-[10px] px-2.5 py-1 rounded-full uppercase tracking-wider">
+            <span className="bg-rose-600 text-white font-bold text-[10px] px-3 py-1 rounded-full uppercase tracking-wider shadow-md">
               Out of Stock
             </span>
           </div>
         )}
       </div>
 
-      {/* Product Details Section */}
+      {/* Details Section */}
       <div className="p-3 md:p-4 flex-1 flex flex-col justify-between space-y-2">
         <div>
-          <div className="flex items-center justify-between text-[10px] md:text-xs text-slate-400 font-medium mb-1">
-            <span className="uppercase tracking-wider font-bold">{product.brand || 'KING DAY'}</span>
-            <span className="truncate max-w-[90px]">{product.sku}</span>
+          <div className="flex items-center justify-between text-[10px] md:text-xs text-slate-400 font-semibold mb-1">
+            <span className="uppercase tracking-wider font-bold text-brand-purple/80">{product.brand || 'KING DAY'}</span>
+            <span className="truncate font-mono text-[10px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded">{product.sku}</span>
           </div>
 
           <Link
             to={`/product/${product.slug}`}
-            className="font-bold text-slate-800 hover:text-brand-blue line-clamp-2 text-xs md:text-sm leading-snug mb-1 min-h-[36px]"
+            className="font-bold text-slate-800 group-hover:text-brand-blue line-clamp-2 text-xs md:text-sm leading-snug mb-1 min-h-[36px] transition-colors"
           >
             {product.name}
           </Link>
         </div>
 
-        {/* Pricing & Actions */}
-        <div className="pt-2 border-t border-slate-100 space-y-2">
+        {/* Price & Action Buttons */}
+        <div className="pt-2 border-t border-slate-100 space-y-2.5">
           <div className="flex items-baseline space-x-1.5">
             <span className="text-base md:text-lg font-black text-slate-900">
               ₹{Number(product.salePrice).toLocaleString('en-IN')}
@@ -121,7 +121,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
               href={whatsappUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="w-full py-2 px-2 rounded-xl font-extrabold text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white transition-all flex items-center justify-center space-x-1 min-h-[44px] shadow-2xs"
+              className="w-full py-2 px-2 rounded-xl font-extrabold text-[11px] bg-emerald-600 hover:bg-emerald-700 text-white transition-all flex items-center justify-center space-x-1 min-h-[44px] shadow-2xs active:scale-[0.98]"
             >
               <MessageCircle className="w-3.5 h-3.5 fill-current" />
               <span>BUY ON WHATSAPP</span>
@@ -130,7 +130,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             <button
               onClick={handleAddToCart}
               disabled={isOutOfStock || adding}
-              className={`w-full py-2 px-2 rounded-xl font-bold text-[11px] flex items-center justify-center space-x-1 transition-all min-h-[44px] ${
+              className={`w-full py-2 px-2 rounded-xl font-bold text-[11px] flex items-center justify-center space-x-1 transition-all min-h-[44px] active:scale-[0.98] ${
                 added
                   ? 'bg-emerald-100 text-emerald-800'
                   : isOutOfStock
@@ -140,7 +140,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             >
               {added ? (
                 <>
-                  <Check className="w-3.5 h-3.5" />
+                  <Check className="w-3.5 h-3.5 text-emerald-700" />
                   <span>Added</span>
                 </>
               ) : (
@@ -156,3 +156,4 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     </div>
   );
 };
+

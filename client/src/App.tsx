@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { CartProvider } from './contexts/CartContext';
+import { ToastProvider } from './contexts/ToastContext';
 import { ScrollToTop } from './components/ScrollToTop';
 import { CustomerLayout } from './layouts/CustomerLayout';
 import { AdminLayout } from './layouts/AdminLayout';
@@ -36,9 +37,10 @@ import { AdminCustomers } from './pages/admin/AdminCustomers';
 
 export const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <CartProvider>
-        <ScrollToTop />
+    <ToastProvider>
+      <AuthProvider>
+        <CartProvider>
+          <ScrollToTop />
         <Routes>
           {/* Customer Storefront Routes */}
           <Route path="/" element={<CustomerLayout />}>
@@ -76,5 +78,6 @@ export const App: React.FC = () => {
         </Routes>
       </CartProvider>
     </AuthProvider>
+  </ToastProvider>
   );
 };

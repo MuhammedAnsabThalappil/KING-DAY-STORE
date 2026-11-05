@@ -103,69 +103,69 @@ export const AdminCoupons: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-400 mb-1">Coupon Code (Uppercase) *</label>
+                <label className="block font-semibold text-slate-300 mb-1.5">Coupon Code (Uppercase) *</label>
                 <input
                   type="text"
                   required
                   placeholder="e.g. FESTIVE20"
                   value={formData.code}
                   onChange={(e) => setFormData({ ...formData, code: e.target.value.toUpperCase() })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple font-mono uppercase"
+                  className="form-input-dark font-mono uppercase"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-400 mb-1">Discount Type *</label>
+                  <label className="block font-semibold text-slate-300 mb-1.5">Discount Type *</label>
                   <select
                     value={formData.type}
                     onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                    className="form-input-dark"
                   >
-                    <option value="PERCENTAGE">Percentage (%)</option>
-                    <option value="FIXED_AMOUNT">Fixed Amount (₹)</option>
+                    <option value="PERCENTAGE" className="bg-slate-900 text-white">Percentage (%)</option>
+                    <option value="FIXED_AMOUNT" className="bg-slate-900 text-white">Fixed Amount (₹)</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-400 mb-1">Value *</label>
+                  <label className="block font-semibold text-slate-300 mb-1.5">Value *</label>
                   <input
                     type="number"
                     required
                     value={formData.value}
                     onChange={(e) => setFormData({ ...formData, value: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                    className="form-input-dark"
                   />
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-slate-400 mb-1">Min Order Amount (₹)</label>
+                  <label className="block font-semibold text-slate-300 mb-1.5">Min Order Amount (₹)</label>
                   <input
                     type="number"
                     value={formData.minimumOrderAmount}
                     onChange={(e) => setFormData({ ...formData, minimumOrderAmount: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                    className="form-input-dark"
                   />
                 </div>
                 <div>
-                  <label className="block font-bold text-slate-400 mb-1">Max Discount (₹)</label>
+                  <label className="block font-semibold text-slate-300 mb-1.5">Max Discount (₹)</label>
                   <input
                     type="number"
                     value={formData.maximumDiscount}
                     onChange={(e) => setFormData({ ...formData, maximumDiscount: parseFloat(e.target.value) })}
-                    className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                    className="form-input-dark"
                   />
                 </div>
               </div>
 
-              <div className="flex justify-end space-x-3 pt-3 border-t border-slate-800">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-slate-800 rounded-xl font-bold">
+              <div className="flex justify-end space-x-3 pt-4 border-t border-slate-800">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold rounded-xl min-h-[44px]">
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2 bg-brand-purple text-white font-bold rounded-xl hover:bg-brand-pink">
+                <button type="submit" className="px-6 py-2.5 bg-gradient-to-r from-brand-purple to-brand-pink text-white font-bold rounded-xl hover:shadow-brand-glow transition-all min-h-[44px]">
                   Create Coupon
                 </button>
               </div>

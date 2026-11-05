@@ -5,7 +5,10 @@ import { Category } from '../../types';
 import { SEO } from '../../components/SEO';
 import { ImageUploader } from '../../components/ImageUploader';
 
+import { useToast } from '../../contexts/ToastContext';
+
 export const AdminCategories: React.FC = () => {
+  const { toast } = useToast();
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -39,8 +42,11 @@ export const AdminCategories: React.FC = () => {
         body: JSON.stringify(formData)
       });
       if (res.success) {
+        toast.success('Category updated successfully');
         setIsModalOpen(false);
         loadCategories();
+      } else {
+        toast.error('Could not update category');
       }
     } else {
       const res = await fetchApi('/categories', {
@@ -48,8 +54,11 @@ export const AdminCategories: React.FC = () => {
         body: JSON.stringify(formData)
       });
       if (res.success) {
+        toast.success('Category created successfully');
         setIsModalOpen(false);
         loadCategories();
+      } else {
+        toast.error('Could not create category');
       }
     }
   };
@@ -57,7 +66,12 @@ export const AdminCategories: React.FC = () => {
   const handleDelete = async (id: string) => {
     if (!window.confirm('Delete category?')) return;
     const res = await fetchApi(`/categories/${id}`, { method: 'DELETE' });
-    if (res.success) loadCategories();
+    if (res.success) {
+      toast.success('Category archived successfully');
+      loadCategories();
+    } else {
+      toast.error('Failed to delete category');
+    }
   };
 
   return (
@@ -137,39 +151,41 @@ export const AdminCategories: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-400 mb-1">Category Name *</label>
+                <label className="block font-semibold text-slate-300 mb-1.5">Category Name *</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                  className="form-input-dark"
+                  placeholder="e.g. Electric Ride-On Cars"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-400 mb-1">Parent Category (Optional)</label>
+                <label className="block font-semibold text-slate-300 mb-1.5">Parent Category (Optional)</label>
                 <select
                   value={formData.parentId || ''}
                   onChange={(e) => setFormData({ ...formData, parentId: e.target.value || null })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                  className="form-input-dark"
                 >
-                  <option value="">None (Top-Level Category)</option>
+                  <option value="" className="bg-slate-900 text-white">None (Top-Level Category)</option>
                   {categories.filter((c) => c.id !== editingId).map((c) => (
-                    <option key={c.id} value={c.id}>{c.name}</option>
+                    <option key={c.id} value={c.id} className="bg-slate-900 text-white">{c.name}</option>
                   ))}
                 </select>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-400 mb-1">Description</label>
+                <label className="block font-semibold text-slate-300 mb-1.5">Description</label>
                 <textarea
                   rows={2}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                  className="form-input-dark resize-none"
+                  placeholder="Short summary of toys in this category"
                 />
               </div>
 
@@ -179,12 +195,12 @@ export const AdminCategories: React.FC = () => {
                 onChange={(url) => setFormData({ ...formData, imageUrl: url })}
               />
 
-              <div className="flex justify-end space-x-3 pt-3 border-t border-slate-800">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-slate-800 rounded-xl font-bold">
+              <div className="flex justify-end space-x-3 pt-4 border-t border-slate-800">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold min-h-[44px]">
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2 bg-brand-purple text-white font-bold rounded-xl hover:bg-brand-pink">
-                  Save
+                <button type="submit" className="px-6 py-2.5 bg-gradient-to-r from-brand-purple to-brand-pink text-white font-bold rounded-xl hover:shadow-brand-glow transition-all min-h-[44px]">
+                  Save Category
                 </button>
               </div>
             </form>

@@ -1,6 +1,35 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { fetchApi } from '../api/client';
-import { Cart, Product, CartItem, Coupon } from '../types';
+import { Cart, Product, Coupon } from '../types';
+import { useToast } from './ToastContext';
+
+// ---------------------------------------------------------------------------
+// Wishlist for GUEST users is stored in localStorage only.
+// The backend Wishlist model requires a valid Customer FK — a session string
+// cannot satisfy that constraint. We only call the backend wishlist API when
+// a real customer is authenticated (future feature).
+// ---------------------------------------------------------------------------
+
+const WISHLIST_KEY = 'kd_wishlist_products';
+
+function loadLocalWishlist(): Product[] {
+  try {
+    const raw = localStorage.getItem(WISHLIST_KEY);
+    return raw ? (JSON.parse(raw) as Product[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function saveLocalWishlist(items: Product[]) {
+  try {
+    localStorage.setItem(WISHLIST_KEY, JSON.stringify(items));
+  } catch {
+    // ignore storage quota errors
+  }
+}
+
+// ---------------------------------------------------------------------------
 
 interface CartContextType {
   cart: Cart | null;
@@ -21,66 +50,62 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { toast } = useToast();
   const [cart, setCart] = useState<Cart | null>(null);
-  const [wishlist, setWishlist] = useState<Product[]>([]);
+  const [wishlist, setWishlist] = useState<Product[]>(loadLocalWishlist);
   const [loading, setLoading] = useState<boolean>(true);
   const [appliedCoupon, setAppliedCoupon] = useState<Coupon | null>(null);
   const [discountAmount, setDiscountAmount] = useState<number>(0);
 
-  const getSessionId = () => {
+  // Stable session ID — stored in localStorage, never sent as customerId FK
+  const getSessionId = useCallback((): string => {
     let sid = localStorage.getItem('kd_session_id');
     if (!sid) {
-      sid = 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
+      sid = 'sess_' + Date.now() + '_' + Math.random().toString(36).substring(2, 9);
       localStorage.setItem('kd_session_id', sid);
     }
     return sid;
-  };
+  }, []);
 
-  const fetchCart = async () => {
+  // Persist wishlist to localStorage whenever it changes
+  useEffect(() => {
+    saveLocalWishlist(wishlist);
+  }, [wishlist]);
+
+  const fetchCart = useCallback(async () => {
     const sid = getSessionId();
-    const res = await fetchApi<Cart>(`/cart?sessionId=${sid}`);
+    const res = await fetchApi<Cart>(`/cart?sessionId=${encodeURIComponent(sid)}`);
     if (res.success && res.data) {
       setCart(res.data);
     }
-  };
-
-  const fetchWishlist = async () => {
-    const sid = getSessionId();
-    const res = await fetchApi<Product[]>(`/wishlist?customerId=${sid}`);
-    if (res.success && res.data) {
-      setWishlist(res.data);
-    }
-  };
+  }, [getSessionId]);
 
   useEffect(() => {
     const init = async () => {
       setLoading(true);
-      await Promise.all([fetchCart(), fetchWishlist()]);
+      await fetchCart();
       setLoading(false);
     };
     init();
-  }, []);
+  }, [fetchCart]);
 
-  const addToCart = async (productId: string, quantity = 1, variantId?: string) => {
+  const addToCart = async (productId: string, quantity = 1, variantId?: string): Promise<boolean> => {
     const sid = getSessionId();
     const res = await fetchApi<Cart>('/cart/items', {
       method: 'POST',
-      body: JSON.stringify({
-        productId,
-        quantity,
-        variantId,
-        sessionId: sid
-      })
+      body: JSON.stringify({ productId, quantity, variantId, sessionId: sid })
     });
 
     if (res.success && res.data) {
       setCart(res.data);
+      toast.success('Added to cart');
       return true;
     }
+    toast.error(res.error?.message || 'Failed to add item to cart');
     return false;
   };
 
-  const updateQuantity = async (cartItemId: string, quantity: number) => {
+  const updateQuantity = async (cartItemId: string, quantity: number): Promise<boolean> => {
     const res = await fetchApi(`/cart/items/${cartItemId}`, {
       method: 'PUT',
       body: JSON.stringify({ quantity })
@@ -88,24 +113,24 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     if (res.success) {
       await fetchCart();
+      toast.info('Cart updated');
       return true;
     }
+    toast.error(res.error?.message || 'Failed to update cart');
     return false;
   };
 
-  const removeFromCart = async (cartItemId: string) => {
-    const res = await fetchApi(`/cart/items/${cartItemId}`, {
-      method: 'DELETE'
-    });
-
+  const removeFromCart = async (cartItemId: string): Promise<boolean> => {
+    const res = await fetchApi(`/cart/items/${cartItemId}`, { method: 'DELETE' });
     if (res.success) {
       await fetchCart();
+      toast.info('Removed from cart');
       return true;
     }
     return false;
   };
 
-  const clearCart = async () => {
+  const clearCart = async (): Promise<boolean> => {
     if (!cart) return false;
     const res = await fetchApi('/cart/clear', {
       method: 'POST',
@@ -121,37 +146,22 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return false;
   };
 
-  const toggleWishlist = async (product: Product) => {
-    const sid = getSessionId();
-    const isSaved = wishlist.some(p => p.id === product.id);
-
-    // Optimistic update
+  // Guest wishlist — local only, no backend FK violation
+  const toggleWishlist = async (product: Product): Promise<boolean> => {
+    const isSaved = wishlist.some((p) => p.id === product.id);
     if (isSaved) {
-      setWishlist(prev => prev.filter(p => p.id !== product.id));
+      setWishlist((prev) => prev.filter((p) => p.id !== product.id));
+      toast.info('Removed from wishlist');
     } else {
-      setWishlist(prev => [...prev, product]);
-    }
-
-    const res = await fetchApi('/wishlist/toggle', {
-      method: 'POST',
-      body: JSON.stringify({
-        customerId: sid,
-        productId: product.id
-      })
-    });
-
-    if (!res.success) {
-      await fetchWishlist(); // Revert on error
-      return false;
+      setWishlist((prev) => [...prev, product]);
+      toast.success('Saved to wishlist ❤️');
     }
     return true;
   };
 
-  const isInWishlist = (productId: string) => {
-    return wishlist.some(p => p.id === productId);
-  };
+  const isInWishlist = (productId: string) => wishlist.some((p) => p.id === productId);
 
-  const applyCoupon = async (code: string) => {
+  const applyCoupon = async (code: string): Promise<{ success: boolean; message: string }> => {
     if (!cart || cart.subtotal === 0) {
       return { success: false, message: 'Cart is empty' };
     }
@@ -163,10 +173,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
       discountAmount: number;
     }>('/coupons/validate', {
       method: 'POST',
-      body: JSON.stringify({
-        code,
-        cartAmount: cart.subtotal
-      })
+      body: JSON.stringify({ code, cartAmount: cart.subtotal })
     });
 
     if (res.success && res.data) {
@@ -179,13 +186,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         active: true
       });
       setDiscountAmount(res.data.discountAmount);
-      return { success: true, message: `Coupon ${code} applied!` };
+      return { success: true, message: `Coupon "${code}" applied — saving ₹${res.data.discountAmount.toLocaleString('en-IN')}!` };
     }
 
-    return {
-      success: false,
-      message: res.error?.message || 'Invalid coupon code'
-    };
+    return { success: false, message: res.error?.message || 'Invalid or expired coupon code' };
   };
 
   const removeCoupon = () => {

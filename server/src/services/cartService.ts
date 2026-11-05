@@ -124,7 +124,45 @@ export class CartService {
       });
     }
 
-    return await this.getOrCreateCart(undefined, undefined);
+    // Fetch the updated cart using the cartId that was passed in
+    const updatedCart = await prisma.cart.findUnique({
+      where: { id: cartId },
+      include: {
+        items: {
+          include: {
+            product: {
+              include: {
+                images: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }] },
+                inventory: true
+              }
+            },
+            variant: true
+          }
+        }
+      }
+    });
+
+    if (!updatedCart) throw new Error('Cart not found after update');
+
+    // Re-compute subtotal on the updated cart
+    let subtotal = 0;
+    const validatedItems = updatedCart.items.map((item: any) => {
+      const price = item.variant ? Number(item.variant.price) : Number(item.product.salePrice);
+      const stock = item.product.inventory?.availableQuantity ?? 0;
+      const isAvailable = item.product.active && stock >= item.quantity;
+      const total = price * item.quantity;
+      if (isAvailable) subtotal += total;
+      return { ...item, currentPrice: price, itemTotal: total, availableStock: stock, isAvailable };
+    });
+
+    return {
+      id: updatedCart.id,
+      customerId: updatedCart.customerId,
+      sessionId: updatedCart.sessionId,
+      items: validatedItems,
+      subtotal,
+      totalItems: validatedItems.reduce((acc: number, curr: any) => acc + curr.quantity, 0)
+    };
   }
 
   static async updateItemQuantity(cartItemId: string, quantity: number) {

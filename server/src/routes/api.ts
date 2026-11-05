@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { getHealth } from '../controllers/healthController.js';
-import { login, getCurrentUser } from '../controllers/authController.js';
+import { login, logoutAdmin, getCurrentUser } from '../controllers/authController.js';
 import {
   getProducts,
   getProductByIdOrSlug,
@@ -32,6 +32,7 @@ import {
   createOrder,
   getOrders,
   getOrderById,
+  trackOrderByNumber,
   updateOrderStatus,
   cancelOrder
 } from '../controllers/orderController.js';
@@ -39,7 +40,9 @@ import { createPaymentOrder, verifyPayment } from '../controllers/paymentControl
 import { validateCoupon, getCoupons, createCoupon } from '../controllers/couponController.js';
 import { getBanners, createBanner, deleteBanner } from '../controllers/bannerController.js';
 import { getDashboardMetrics } from '../controllers/adminController.js';
+import { processAiProductAssistant } from '../controllers/aiController.js';
 import { uploadImage } from '../controllers/uploadController.js';
+import { getCustomers } from '../controllers/customerController.js';
 import { uploadMiddleware } from '../config/storage.js';
 import { authenticate } from '../middleware/auth.js';
 
@@ -50,6 +53,7 @@ router.get('/health', getHealth);
 
 // Auth
 router.post('/auth/login', login);
+router.post('/auth/admin/logout', logoutAdmin);
 router.get('/auth/me', authenticate, getCurrentUser);
 
 // Products
@@ -66,29 +70,32 @@ router.post('/categories', authenticate, createCategory);
 router.put('/categories/:id', authenticate, updateCategory);
 router.delete('/categories/:id', authenticate, deleteCategory);
 
-// Inventory
+// Inventory (admin-only)
 router.get('/inventory', authenticate, getInventoryOverview);
 router.get('/inventory/transactions', authenticate, getInventoryTransactions);
 router.get('/inventory/transactions/:productId', authenticate, getInventoryTransactions);
 router.post('/inventory/adjust', authenticate, adjustStock);
 
-// Cart
+// Cart (session-based, no auth required)
 router.get('/cart', getCart);
 router.post('/cart/items', addToCart);
 router.put('/cart/items/:id', updateCartItem);
 router.delete('/cart/items/:id', removeCartItem);
 router.post('/cart/clear', clearCart);
 
-// Wishlist
+// Wishlist (session-based, no auth required)
 router.get('/wishlist', getWishlist);
 router.post('/wishlist/toggle', toggleWishlist);
 
 // Orders
+// Public: create order (checkout) and track a single order by orderNumber + phone
 router.post('/orders', createOrder);
-router.get('/orders', getOrders);
-router.get('/orders/:id', getOrderById);
+router.get('/orders/track', trackOrderByNumber); // public order tracking
+// Admin-only: list all orders, get full order by id, update status
+router.get('/orders', authenticate, getOrders);
+router.get('/orders/:id', authenticate, getOrderById);
 router.patch('/orders/:id/status', authenticate, updateOrderStatus);
-router.post('/orders/:id/cancel', cancelOrder);
+router.post('/orders/:id/cancel', authenticate, cancelOrder);
 
 // Payments
 router.post('/payments/create-order', createPaymentOrder);
@@ -106,8 +113,12 @@ router.delete('/banners/:id', authenticate, deleteBanner);
 
 // Admin
 router.get('/admin/metrics', authenticate, getDashboardMetrics);
+router.post('/admin/ai/product-assistant', authenticate, processAiProductAssistant);
 
-// Uploads
+// Customers (admin-only)
+router.get('/customers', authenticate, getCustomers);
+
+// Uploads (admin-only)
 router.post('/uploads', authenticate, uploadMiddleware.single('image'), uploadImage);
 
 export default router;

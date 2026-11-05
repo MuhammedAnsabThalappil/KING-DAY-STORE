@@ -292,19 +292,19 @@ export class OrderService {
         throw new Error('Order not found');
       }
 
-      // If cancelling an order, release reserved stock
+      // If cancelling an order, release reserved stock back to available
       if (status === OrderStatus.CANCELLED && order.status !== OrderStatus.CANCELLED) {
         for (const item of order.items) {
           const inv = await tx.inventory.findUnique({ where: { productId: item.productId } });
           if (inv) {
+            // On order create, availableQuantity was decremented and reservedQuantity was incremented.
+            // quantity (total physical stock) was NOT changed. On cancel we only un-reserve.
             const newReserved = Math.max(0, inv.reservedQuantity - item.quantity);
-            const newQuantity = inv.quantity + item.quantity;
-            const newAvailable = newQuantity - newReserved;
+            const newAvailable = inv.quantity - newReserved;
 
             await tx.inventory.update({
               where: { productId: item.productId },
               data: {
-                quantity: newQuantity,
                 reservedQuantity: newReserved,
                 availableQuantity: newAvailable
               }
@@ -316,7 +316,7 @@ export class OrderService {
                 type: TransactionType.CANCELLATION,
                 quantity: item.quantity,
                 previousQuantity: inv.quantity,
-                newQuantity,
+                newQuantity: inv.quantity,
                 referenceType: 'ORDER_CANCELLED',
                 referenceId: order.id,
                 note: `Stock restored from cancelled order #${order.orderNumber}`

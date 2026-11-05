@@ -102,25 +102,27 @@ export const AdminBanners: React.FC = () => {
               </button>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-3 text-xs">
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-400 mb-1">Title *</label>
+                <label className="block font-semibold text-slate-300 mb-1.5">Title *</label>
                 <input
                   type="text"
                   required
+                  placeholder="e.g. Festival Super Sale"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                  className="form-input-dark"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-400 mb-1">Subtitle</label>
+                <label className="block font-semibold text-slate-300 mb-1.5">Subtitle</label>
                 <input
                   type="text"
+                  placeholder="e.g. Up to 40% OFF on Electric Ride-Ons"
                   value={formData.subtitle}
                   onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                  className="form-input-dark"
                 />
               </div>
 
@@ -131,20 +133,20 @@ export const AdminBanners: React.FC = () => {
               />
 
               <div>
-                <label className="block font-bold text-slate-400 mb-1">CTA Link Route</label>
+                <label className="block font-semibold text-slate-300 mb-1.5">CTA Link Route</label>
                 <input
                   type="text"
                   value={formData.link}
                   onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                  className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl focus:outline-none focus:border-brand-purple"
+                  className="form-input-dark"
                 />
               </div>
 
-              <div className="flex justify-end space-x-3 pt-3 border-t border-slate-800">
-                <button type="button" onClick={() => setIsModalOpen(false)} className="px-4 py-2 bg-slate-800 rounded-xl font-bold">
+              <div className="flex justify-end space-x-3 pt-4 border-t border-slate-800">
+                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl font-semibold min-h-[44px]">
                   Cancel
                 </button>
-                <button type="submit" className="px-6 py-2 bg-brand-purple text-white font-bold rounded-xl hover:bg-brand-pink">
+                <button type="submit" className="px-6 py-2.5 bg-gradient-to-r from-brand-purple to-brand-pink text-white font-bold rounded-xl hover:shadow-brand-glow transition-all min-h-[44px]">
                   Create Banner
                 </button>
               </div>

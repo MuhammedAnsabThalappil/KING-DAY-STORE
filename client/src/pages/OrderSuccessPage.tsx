@@ -38,19 +38,19 @@ export const OrderSuccessPage: React.FC = () => {
         </div>
 
         <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-widest text-emerald-600 bg-emerald-50 px-3 py-1 rounded-full">
+          <span className="text-xs font-extrabold uppercase tracking-widest text-emerald-700 bg-emerald-50 px-3.5 py-1 rounded-full border border-emerald-200">
             Order Placed Successfully
           </span>
-          <h1 className="text-3xl font-extrabold text-slate-900">Thank You for Shopping with KING DAY!</h1>
-          <p className="text-slate-500 text-sm">
-            We have received your order and are preparing it for express dispatch across India.
+          <h1 className="text-2xl md:text-4xl font-extrabold text-slate-900 tracking-tight">Thank You for Shopping with KING DAY!</h1>
+          <p className="text-slate-500 text-xs md:text-sm max-w-md mx-auto leading-relaxed font-medium">
+            We have received your order details and are preparing it for express dispatch across India.
           </p>
         </div>
 
         {orderNumber && (
-          <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 inline-block">
-            <span className="text-xs font-bold text-slate-400 block uppercase">Order Reference Number</span>
-            <span className="text-xl md:text-2xl font-black text-brand-purple tracking-wider">
+          <div className="p-5 bg-slate-50 rounded-2xl border border-slate-200 inline-block shadow-2xs">
+            <span className="text-xs font-bold text-slate-400 block uppercase tracking-wider">Order Reference Number</span>
+            <span className="text-xl md:text-3xl font-black text-brand-purple tracking-wider font-mono">
               #{orderNumber}
             </span>
           </div>
@@ -60,7 +60,7 @@ export const OrderSuccessPage: React.FC = () => {
         <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             to={`/orders`}
-            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-brand-purple text-white font-bold text-sm shadow-brand-glow hover:bg-brand-blue transition-all min-h-[44px] flex items-center justify-center space-x-2"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-brand-purple text-white font-extrabold text-xs md:text-sm shadow-brand-glow hover:bg-brand-blue transition-all min-h-[44px] flex items-center justify-center space-x-2 active:scale-95"
           >
             <Package className="w-4 h-4" />
             <span>Track Order Timeline</span>
@@ -70,7 +70,7 @@ export const OrderSuccessPage: React.FC = () => {
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-emerald-500 text-white font-bold text-sm shadow-md hover:bg-emerald-600 transition-all min-h-[44px] flex items-center justify-center space-x-2"
+            className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-emerald-600 text-white font-extrabold text-xs md:text-sm shadow-md hover:bg-emerald-700 transition-all min-h-[44px] flex items-center justify-center space-x-2 active:scale-95"
           >
             <MessageCircle className="w-4 h-4 fill-current" />
             <span>Send Order to WhatsApp</span>
@@ -80,3 +80,4 @@ export const OrderSuccessPage: React.FC = () => {
     </div>
   );
 };
+
