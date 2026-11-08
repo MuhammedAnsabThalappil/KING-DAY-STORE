@@ -17,10 +17,16 @@ if (isProd) {
   }
 }
 
+function sanitizeDatabaseUrl(url?: string): string {
+  if (!url) return 'postgresql://postgres:postgres@localhost:5432/kingdaydb?schema=public';
+  // Prisma's Rust engine fails connection negotiation when channel_binding=require is enforced
+  return url.replace(/([?&])channel_binding=[^&]+(&|$)/, '$1').replace(/[?&]$/, '');
+}
+
 export const env = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: parseInt(process.env.PORT || '5000', 10),
-  DATABASE_URL: process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/kingdaydb?schema=public',
+  DATABASE_URL: sanitizeDatabaseUrl(process.env.DATABASE_URL),
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:3000',
   // No hardcoded production secret — in development a local-only key is acceptable
   JWT_SECRET: process.env.JWT_SECRET || 'dev-only-jwt-secret-DO-NOT-USE-IN-PROD',

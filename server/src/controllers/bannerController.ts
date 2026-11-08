@@ -4,7 +4,7 @@ import { sendSuccess } from '../utils/response.js';
 
 export async function getBanners(req: Request, res: Response, next: NextFunction) {
   try {
-    const activeOnly = req.query.activeOnly === 'false' ? false : true;
+    const activeOnly = req.query?.activeOnly === 'false' ? false : true;
     const banners = await prisma.banner.findMany({
       where: activeOnly ? { active: true } : {},
       orderBy: { sortOrder: 'asc' }

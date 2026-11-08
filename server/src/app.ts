@@ -1,3 +1,4 @@
+import { env } from './config/env.js';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -7,10 +8,14 @@ import apiRouter from './routes/api.js';
 import { getHealth } from './controllers/healthController.js';
 import { errorHandler } from './middleware/errorHandler.js';
 import { rateLimiter } from './middleware/rateLimiter.js';
-import { env } from './config/env.js';
 import { sendError } from './utils/response.js';
 
 const app = express();
+
+app.use((req, res, next) => {
+  console.log(`[REQ RECEIVED] ${req.method} ${req.url}`);
+  next();
+});
 
 // Security Headers
 app.use(helmet({
